@@ -1,0 +1,6 @@
+.Title {
+    -unity-font-style: bold;
+    -unity-background-image-tint-color: rgb(255, 0, 0);
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+}

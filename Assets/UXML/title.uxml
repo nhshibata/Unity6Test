@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Label text="Label" name="label_lt" style="left: 0; position: absolute; scale: 2 2; translate: 50% 0;" />
+    <ui:Label text="Label" name="lable_rt" style="-unity-text-align: upper-left; right: 0; position: absolute; translate: -50% 0; scale: 2 2;" />
+    <ui:Label text="Label" name="label_lb" style="bottom: 0; left: 0; position: absolute; translate: 50% 0; scale: 2 2;" />
+    <ui:Button text="Button" style="position: absolute; bottom: 15%; left: 50%; right: auto; top: auto; -unity-text-align: middle-center; align-items: center; justify-content: center; align-self: center; align-content: auto; -unity-background-scale-mode: stretch-to-fill; background-position-x: center 0; translate: -50% 0; scale: 2 2;" />
+    <ui:VisualElement name="logo" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/TutorialInfo/Icons/URP.png?fileID=2800000&amp;guid=727a75301c3d24613a3ebcec4a24c2c8&amp;type=3#URP&quot;); scale: 0.4 0.4;" />
+</ui:UXML>

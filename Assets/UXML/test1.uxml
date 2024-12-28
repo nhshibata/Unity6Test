@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/USS/test2.uss?fileID=7433441132597879392&amp;guid=d9281acee06e3994580c1ec9c63ecf63&amp;type=3#test2" />
+    <ui:Label text="日本語テスト&#10;いい天気（新潟では）" enabled="true" class="Title" style="width: auto; font-size: 38px; -unity-text-align: middle-left; white-space: nowrap; text-overflow: ellipsis; -unity-font-style: normal;" />
+    <ui:TextField label="Text Field" placeholder-text="filler text" class="Title" />
+    <ui:Button text="Button" icon-image="project://database/Resources/unity_builtin_extra?fileID=10910&amp;guid=0000000000000000f000000000000000&amp;type=0#InputFieldBackground" style="font-size: 22px; -unity-text-align: middle-left; text-overflow: clip;" />
+</ui:UXML>
