@@ -77,24 +77,6 @@ public class SelectionDisplayManager : MonoBehaviour
         historyNumber[0].text = number.ToString();
     }
 
-    private List<int> GetSelectionsInOrder(bool fifo, bool ascendingOrder)
-    {
-        List<int> orderedList = new List<int>(currentSelections);
-
-        if (!fifo)
-        {
-            if (ascendingOrder)
-            {
-                orderedList.Sort();
-            }
-            else
-            {
-                orderedList.Sort((a, b) => b.CompareTo(a));
-            }
-        }
-        return orderedList;
-    }
-
     private void CreateOrUpdateSelectionPanel(int selection)
     {
         // すでに生成されたパネルがあるか確認
