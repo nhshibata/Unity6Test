@@ -47,7 +47,7 @@ public class RandomSelecter : MonoBehaviour
           () => model.MaxNumber.CurrentValue.ToString(),
           (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
           str => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
-      );
+        );
 
         view.AddMinListener(
             () => model.SetMinNumber(model.MinNumber.CurrentValue + 1),
@@ -58,14 +58,13 @@ public class RandomSelecter : MonoBehaviour
         );
 
         view.AddToggleListener(value => model.ShouldConsume.Value = value);
+        view.AddResetButtonListener(() => { model.Reset(); });
+        view.SetHistoryNumbers((fifo, order) => model.GetSelectionsInOrder(fifo, order));
 
         view.OnClickStart += async (value) =>
         {
             if (value)
             {
-                Debug.Log($"Mapサイズ: {model.GetMapSize()}");
-                Debug.Log($"使用可能な数字がある: {model.HasUsableNumbers()}");
-
                 if (model.HasUsableNumbers())
                 {
                     cts = new CancellationTokenSource(); // 新しいトークンを作成
@@ -76,7 +75,9 @@ public class RandomSelecter : MonoBehaviour
                     catch (OperationCanceledException)
                     {
                         // キャンセルされた場合の処理
-                        Debug.Log("SelectNumberAsync が安全にキャンセル");
+                        Debug.Log($"SelectNumberAsync が安全にキャンセル{model.SelectNumber.CurrentValue}で終了");
+                        view.SetRandomNumberText(model.SelectNumber.CurrentValue);
+                        model.ConfirmedNumber();
                     }
                     catch (Exception ex)
                     {
@@ -92,15 +93,29 @@ public class RandomSelecter : MonoBehaviour
             else
             {
                 cts?.Cancel();
-                model.ConfirmedNumber();
-                view.SetRandomNumberText(model.SelectNumber.CurrentValue);
+                
             }
         };
+
 
         // ReactiveProperty の監視
         model.SelectNumber
             .Skip(1)
-            .Subscribe(value => view.SetRandomNumberText(value))
+            .Subscribe(current =>
+            {
+                // 必要に応じて処理
+                view.SetRandomNumberText(current);
+            })
+            .AddTo(disposables);
+
+        model.PrevNumber
+            .Skip(1)
+            .Pairwise()
+            .Subscribe(pair =>
+            {
+                Debug.Log($"前の値: {pair.Previous}, 現在の値: {pair.Current}");
+                view.AddPrevNumber(pair.Previous);
+            })
             .AddTo(disposables);
     }
 
@@ -132,11 +147,11 @@ public class RandomSelecter : MonoBehaviour
                 break;
 
             model.SelectNumber.Value = select;
+            Debug.Log($"終了していない");
 
             // キャンセルのタイミングを確保
-            await UniTask.Yield(token); // tokenを渡すことで非同期処理がキャンセル可能に
+            await UniTask.Yield(token);
         }
-
     }
 
 }

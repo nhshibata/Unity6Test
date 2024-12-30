@@ -33,13 +33,16 @@ public class RandomSelecterModel
 
     private ReactiveProperty<int> maxNumber = new ReactiveProperty<int>(10);
     private ReactiveProperty<int> minNumber = new ReactiveProperty<int>(1);
+    private ReactiveProperty<int> prevNumber = new ReactiveProperty<int>();
     private ReactiveProperty<int> selectNumber = new ReactiveProperty<int>(0);
     private ReactiveProperty<bool> shouldConsume = new ReactiveProperty<bool>(true);
 
     public ReadOnlyReactiveProperty<int> MaxNumber => maxNumber;
     public ReadOnlyReactiveProperty<int> MinNumber => minNumber;
+    public ReadOnlyReactiveProperty<int> PrevNumber => prevNumber;
     public ReactiveProperty<int> SelectNumber => selectNumber;
     public ReactiveProperty<bool> ShouldConsume => shouldConsume;
+
 
     private List<int> queuedSelections = new List<int>();
     private ObservableList<int> selectionLimits = new ObservableList<int>();
@@ -78,7 +81,7 @@ public class RandomSelecterModel
 
         // 既存の購読を解除してから新しい購読を登録
         selectNumberSubscription?.Dispose();
-        selectNumberSubscription = selectNumber.Skip(1).Subscribe(value => queuedSelections.Add(value));
+        selectNumberSubscription = prevNumber.Skip(1).Subscribe(value => queuedSelections.Add(value));
     }
 
     public void Reset()
@@ -164,6 +167,9 @@ public class RandomSelecterModel
 
     public void ConfirmedNumber()
     {
+        Debug.Log($"{prevNumber.Value} current{selectNumber.Value}");
+        prevNumber.Value = selectNumber.Value;
+
         if (shouldConsume.Value)
         {
             selectionCountMap[selectNumber.Value]--;
@@ -208,6 +214,8 @@ public class RandomSelecterModel
 
     public List<int> GetSelectionsInOrder(bool fifo, bool ascendingOrder)
     {
+        Debug.Log($"{queuedSelections.Count}キューのサイズ");
+        
         if (fifo)
         {
             return queuedSelections;

@@ -24,9 +24,11 @@ public partial class RandomSelecterView : MonoBehaviour
     [SerializeField]
     private ImageShaker shaker = null;
     [SerializeField] 
-    private Image targetImage;
+    private RectTransform target = null;
     [SerializeField] 
-    private float rotationDuration = 50f;
+    private float rotationDuration = 50.0f;
+    [SerializeField]
+    private SelectionDisplayManager selectionDisplayManager = null;
     [SerializeField]
     private List<Sprite> charSprites = new List<Sprite>();
 
@@ -52,6 +54,8 @@ public partial class RandomSelecterView : MonoBehaviour
                 rotateTween = null;
             }
         }
+
+        selectionDisplayManager.Reset();
     }
 
     public void AddMinListener(Action increase, Action decrease, Func<string> displayUpdate = null,
@@ -78,6 +82,11 @@ public partial class RandomSelecterView : MonoBehaviour
         resetButton.onClick.AddListener(() => { action?.Invoke(); });
     }
 
+    public void SetHistoryNumbers(Func<bool, bool, List<int>> ret)
+    {
+        selectionDisplayManager.SetHistoryNumbers(ret);
+    }
+
     private void ToggleAnimation()
     {
         if (shaker.IsShaking())
@@ -97,7 +106,7 @@ public partial class RandomSelecterView : MonoBehaviour
         shaker.StartShake();
         OnClickStart?.Invoke(true);
 
-        rotateTween = targetImage.rectTransform.DORotate(new Vector3(0, 0, 360), rotationDuration, RotateMode.FastBeyond360)
+        rotateTween = target.DORotate(new Vector3(0, 0, 360), rotationDuration, RotateMode.FastBeyond360)
             .SetEase(Ease.Linear)
             .SetLoops(-1, LoopType.Restart);
 
@@ -118,6 +127,11 @@ public partial class RandomSelecterView : MonoBehaviour
     public void SetRandomNumberText(int value)
     {
         numberText.text = value.ToString();
+    }
+
+    public void AddPrevNumber(int value)
+    {
+        selectionDisplayManager.SetHistory(value);
     }
 
 }
