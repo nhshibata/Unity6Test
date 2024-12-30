@@ -43,7 +43,6 @@ public class RandomSelecterModel
     public ReactiveProperty<int> SelectNumber => selectNumber;
     public ReactiveProperty<bool> ShouldConsume => shouldConsume;
 
-
     private List<int> queuedSelections = new List<int>();
     private ObservableList<int> selectionLimits = new ObservableList<int>();
     private Dictionary<int, int> selectionCountMap = new Dictionary<int, int>();
@@ -233,6 +232,12 @@ public class RandomSelecterModel
             }
             return orderedList;
         }
+    }
+
+    public Dictionary<int, int> GetSelectionCount()
+    {
+        Dictionary<int, int> ret = new Dictionary<int, int>(selectionCountMap);
+        return ret;
     }
 
     public async UniTask SaveSettingsAsync()

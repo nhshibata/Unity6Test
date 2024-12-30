@@ -32,6 +32,7 @@ public class SelectionDisplayManager : MonoBehaviour
     private List<int> currentSelections = new List<int>();
     private List<TextBinding> selectionPanels = new List<TextBinding>();
     private Func<bool, bool, List<int>> GetSelection { get; set; }
+    private Func<Dictionary<int, int>> GetSelectionMap { get; set; }
 
 
     private void Awake()
@@ -52,7 +53,10 @@ public class SelectionDisplayManager : MonoBehaviour
         // ドロップダウンの選択変更に応じて処理を実行
         orderDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
 
-        openButton.onClick.AddListener(() => { historyPanel.gameObject.SetActive(true); orderDropdown.onValueChanged.Invoke(orderDropdown.value); });
+        openButton.onClick.AddListener(() => { 
+            historyPanel.gameObject.SetActive(true); 
+            orderDropdown.onValueChanged.Invoke(orderDropdown.value); 
+        });
         closeButton.onClick.AddListener(() => { historyPanel.gameObject.SetActive(false); });
     }
 
@@ -62,9 +66,10 @@ public class SelectionDisplayManager : MonoBehaviour
         historyNumber.ForEach(history => { history.text = "-"; });
     }
 
-    public void SetHistoryNumbers(Func<bool, bool, List<int>> ret)
+    public void SetHistoryNumbers(Func<bool, bool, List<int>> ret, Func<Dictionary<int, int>> selectCount)
     {
         GetSelection = ret;
+        GetSelectionMap = selectCount;
     }
 
     public void SetHistory(int number)
@@ -77,7 +82,16 @@ public class SelectionDisplayManager : MonoBehaviour
         historyNumber[0].text = number.ToString();
     }
 
-    private void CreateOrUpdateSelectionPanel(int selection)
+    private void ResetUI()
+    {
+        // 既存のパネルを非表示にする
+        foreach (Transform child in contentTransform)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
+
+    private void CreateOrUpdateSelectionPanel(int selection, bool isRed)
     {
         // すでに生成されたパネルがあるか確認
         TextBinding panel = selectionPanels.Find(p => !p.gameObject.activeSelf);
@@ -92,16 +106,16 @@ public class SelectionDisplayManager : MonoBehaviour
         // パネルに選択肢を設定
         panel.Text.text = selection.ToString();
         panel.gameObject.SetActive(true);
-    }
-
-    private void ResetUI()
-    {
-        // 既存のパネルを非表示にする
-        foreach (Transform child in contentTransform)
+        if(isRed)
         {
-            child.gameObject.SetActive(false);
+            panel.Text.color = Color.red;
+        }
+        else
+        {
+            panel.Text.color = Color.white;
         }
     }
+
 
     public void DisplaySelections(bool fifo, bool ascendingOrder)
     {
@@ -112,11 +126,18 @@ public class SelectionDisplayManager : MonoBehaviour
 
         // 選択肢を取得して表示
         List<int> selectionsToDisplay = currentSelections;
+        var map = GetSelectionMap();
         int num = 0;
         foreach (var selection in selectionsToDisplay)
         {
+            bool isRed = false;
             num++;
-            CreateOrUpdateSelectionPanel(selection);
+            if(map.ContainsKey(selection))
+            {
+                isRed = map[selection] == 0;
+            }
+
+            CreateOrUpdateSelectionPanel(selection, isRed);
         }
         Debug.Log($"{num}");
     }

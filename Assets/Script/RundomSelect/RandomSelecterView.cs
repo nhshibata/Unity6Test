@@ -82,9 +82,9 @@ public partial class RandomSelecterView : MonoBehaviour
         resetButton.onClick.AddListener(() => { action?.Invoke(); });
     }
 
-    public void SetHistoryNumbers(Func<bool, bool, List<int>> ret)
+    public void SetHistoryNumbers(Func<bool, bool, List<int>> ret, Func<Dictionary<int, int>> selectCount)
     {
-        selectionDisplayManager.SetHistoryNumbers(ret);
+        selectionDisplayManager.SetHistoryNumbers(ret, selectCount);
     }
 
     private void ToggleAnimation()

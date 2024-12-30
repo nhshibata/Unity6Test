@@ -59,7 +59,7 @@ public class RandomSelecter : MonoBehaviour
 
         view.AddToggleListener(value => model.ShouldConsume.Value = value);
         view.AddResetButtonListener(() => { model.Reset(); });
-        view.SetHistoryNumbers((fifo, order) => model.GetSelectionsInOrder(fifo, order));
+        view.SetHistoryNumbers((fifo, order) => model.GetSelectionsInOrder(fifo, order), () => model.GetSelectionCount());
 
         view.OnClickStart += async (value) =>
         {
@@ -96,7 +96,6 @@ public class RandomSelecter : MonoBehaviour
                 
             }
         };
-
 
         // ReactiveProperty の監視
         model.SelectNumber
