@@ -1,11 +1,17 @@
+using Cysharp.Threading.Tasks;
+using R3;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [Serializable]
 public class RandomSelecterModel
 {
+    /// <summary>
+    /// 保存するデータ
+    /// </summary>
     [System.Serializable]
     public class ModalSettings
     {
@@ -15,63 +21,69 @@ public class RandomSelecterModel
         public List<int> AvailableNumbers;
     }
 
-
     public const int RANGE_MIN = 0;
     public const int RANGE_MAX = 999;
     public const int EXIT_NUMBER = -1;
+    private const string FileName = "ModalSettings.json";
 
     [SerializeField, Tooltip("デフォルトの最小値")]
     private int defaultMin = 1;
     [SerializeField, Tooltip("デフォルトの最大値")]
     private int defaultMax = 10;
 
-    [SerializeField]
-    private int maxNumber = 10;
-    [SerializeField]
-    private int minNumber = 1;
+    private ReactiveProperty<int> maxNumber = new ReactiveProperty<int>(10);
+    private ReactiveProperty<int> minNumber = new ReactiveProperty<int>(1);
+    private ReactiveProperty<int> selectNumber = new ReactiveProperty<int>(0);
+    private ReactiveProperty<bool> shouldConsume = new ReactiveProperty<bool>(true);
 
-    [SerializeField]
-    private bool shouldConsume = true;
-    
-    [SerializeField]
-    private List<int> list = new List<int>();
+    public ReadOnlyReactiveProperty<int> MaxNumber => maxNumber;
+    public ReadOnlyReactiveProperty<int> MinNumber => minNumber;
+    public ReactiveProperty<int> SelectNumber => selectNumber;
+    public ReactiveProperty<bool> ShouldConsume => shouldConsume;
 
-    private int selectNumber = 0;
-    private Dictionary<int, int> map = new Dictionary<int, int>();
+    private List<int> queuedSelections = new List<int>();
+    private ObservableList<int> selectionLimits = new ObservableList<int>();
+    private Dictionary<int, int> selectionCountMap = new Dictionary<int, int>();
 
-    private const string FileName = "ModalSettings.json";
     private ModalSettings currentSettings;
 
-    public int MaxNumber { get => maxNumber; set => maxNumber = value; }
-    public int MinNumber { get => minNumber; set => minNumber = value; }
-    public int SelectNumber { get => selectNumber; set => selectNumber = value; }
-    public bool ShouldConsume { get => shouldConsume; set => shouldConsume = value; }
+    private IDisposable selectNumberSubscription; 
 
 
     public void Init()
     {
-        LoadSettings();
+        LoadSettings().Forget();
+        queuedSelections.Clear();
 
-        if (list.Count < maxNumber)
+        if (selectionLimits.Count < maxNumber.Value)
         {
-            for (int i = list.Count; i < maxNumber; i++)
+            for (int i = selectionLimits.Count; i < maxNumber.Value; i++)
             {
-                list.Add(1);
+                selectionLimits.Add(1);
             }
         }
 
-        Debug.Log("リストサイズ" + list.Count);
-        for (int i = minNumber; i < maxNumber; i++)
+        Debug.Log("リストサイズ" + selectionLimits.Count);
+        for (int i = minNumber.Value; i < maxNumber.Value; i++)
         {
-            if (map.ContainsKey(i))
+            if (selectionCountMap.ContainsKey(i))
             {
-                map[i] = list[i];
+                selectionCountMap[i] = selectionLimits[i];
             }
             else
             {
-                map.Add(i, list[i]);
+                selectionCountMap.Add(i, selectionLimits[i]);
             }
         }
+
+        // 既存の購読を解除してから新しい購読を登録
+        selectNumberSubscription?.Dispose();
+        selectNumberSubscription = selectNumber.Skip(1).Subscribe(value => queuedSelections.Add(value));
+    }
+
+    public void Reset()
+    {
+        Init();
     }
 
     /// <summary>
@@ -79,7 +91,7 @@ public class RandomSelecterModel
     /// </summary>
     public int GetMapSize()
     {
-        return maxNumber - minNumber + 1;
+        return maxNumber.Value - minNumber.Value + 1;
     }
 
     /// <summary>
@@ -87,22 +99,19 @@ public class RandomSelecterModel
     /// </summary>
     public bool HasUsableNumbers()
     {
-        // isUseがfalseの場合は消費しないのでtrueを返す
-        if (!shouldConsume) 
+        if (!shouldConsume.Value)
             return true;
 
-        int usableCount = 0;
-
-        // map内の値を確認
-        foreach (var kvp in map)
+        foreach (var kvp in selectionCountMap)
         {
-            if (kvp.Value > 0) 
-                usableCount++;
+            if (kvp.Value > 0)
+                return true;
         }
-        return usableCount > 0;
+
+        return false;
     }
 
-    public int GetRandomNumber()
+    public async UniTask<int> GetRandomNumberAsync()
     {
         if (!HasUsableNumbers())
         {
@@ -110,21 +119,21 @@ public class RandomSelecterModel
             return EXIT_NUMBER;
         }
 
-        const int maxAttempts = 100; // 無限ループ防止用
+        const int maxAttempts = 100;
         int attempts = 0;
-
-        int select;
 
         while (attempts < maxAttempts)
         {
-            select = UnityEngine.Random.Range(minNumber, maxNumber + 1);
+            int select = UnityEngine.Random.Range(minNumber.Value, maxNumber.Value + 1);
 
             if (IsSelect(select))
             {
+                selectNumber.Value = select;
                 return select;
             }
 
             attempts++;
+            await UniTask.Yield();
         }
 
         return EXIT_NUMBER;
@@ -132,22 +141,21 @@ public class RandomSelecterModel
 
     public bool IsSelect(int index)
     {
-
-        if (index - 1 < 0 || index - 1 >= list.Count)
+        if (index - 1 < 0 || index - 1 >= selectionLimits.Count)
         {
             Debug.LogError($"無効なインデックス: {index}");
             return false;
         }
 
-        if (map.ContainsKey(index))
+        if (selectionCountMap.ContainsKey(index))
         {
-            var num = map[index];
+            var num = selectionCountMap[index];
             return (num > 0);
         }
         else
         {
-            int reg = list[index - 1];
-            map.Add(index, reg);
+            int reg = selectionLimits[index - 1];
+            selectionCountMap.Add(index, reg);
             Debug.Log($"mapに存在しないため、{index}に{reg}を設定");
         }
 
@@ -156,76 +164,125 @@ public class RandomSelecterModel
 
     public void ConfirmedNumber()
     {
-        if (shouldConsume)
-            map[selectNumber]--;
+        if (shouldConsume.Value)
+        {
+            selectionCountMap[selectNumber.Value]--;
+        }
     }
 
-    public void SetMaxNumber(int maxNumber)
+    public void SetMaxNumber(int value)
     {
-        if (maxNumber < minNumber + 1 || maxNumber > RANGE_MAX)
+        if (value < minNumber.Value + 1 || value > RANGE_MAX)
         {
-            Debug.Log("設定できない:max");
+            Debug.LogError("設定できない:max");
             return;
         }
 
-        this.maxNumber = maxNumber;
+        maxNumber.Value = value;
 
-        if (this.minNumber > this.maxNumber - 1)
+        if (minNumber.Value > maxNumber.Value - 1)
         {
-            this.minNumber = this.maxNumber - 1;
+            minNumber.Value = maxNumber.Value - 1;
         }
+
+        AdjustListSize();
     }
 
-    public void SetMinNumber(int minNumber)
+    public void SetMinNumber(int value)
     {
-        if (minNumber < RANGE_MIN || minNumber > maxNumber - 1)
+        if (value < RANGE_MIN || value > maxNumber.Value - 1)
         {
-            Debug.Log("設定できない:min");
+            Debug.LogError("設定できない:min");
             return;
         }
 
-        this.minNumber = minNumber;
+        minNumber.Value = value;
 
-        if (this.maxNumber < this.minNumber + 1)
+        if (maxNumber.Value < minNumber.Value + 1)
         {
-            this.maxNumber = this.minNumber + 1;
+            maxNumber.Value = minNumber.Value + 1;
+        }
+
+        AdjustListSize();
+    }
+
+    public List<int> GetSelectionsInOrder(bool fifo, bool ascendingOrder)
+    {
+        if (fifo)
+        {
+            return queuedSelections;
+        }
+        else
+        {
+            var orderedList = new List<int>(queuedSelections);
+            if (ascendingOrder)
+            {
+                orderedList.Sort(); // 昇順でソート
+            }
+            else
+            {
+                orderedList.Sort((a, b) => b.CompareTo(a)); // 降順でソート
+            }
+            return orderedList;
         }
     }
 
-
-    /// <summary>
-    /// 設定データを保存
-    /// </summary>
-    public void SaveSettings()
+    public async UniTask SaveSettingsAsync()
     {
         string filePath = Path.Combine(Application.persistentDataPath, FileName);
 
         string json = JsonUtility.ToJson(currentSettings, true);
-        File.WriteAllText(filePath, json);
+        await File.WriteAllTextAsync(filePath, json);
 
         Debug.Log($"Settings saved to: {filePath}");
     }
 
-    /// <summary>
-    /// 設定データをロード
-    /// </summary>
-    public void LoadSettings()
+    private void AdjustListSize()
+    {
+        // list のサイズを maxNumber に合わせて拡張
+        while (selectionLimits.Count < maxNumber.Value)
+        {
+            selectionLimits.Add(1); // デフォルト値（例：1）で埋める
+        }
+
+        // list のサイズを minNumber に合わせて縮小
+        while (selectionLimits.Count > maxNumber.Value)
+        {
+            selectionLimits.RemoveAt(selectionLimits.Count - 1); // 不要な要素を削除
+        }
+
+        // map を再設定（list に合わせる）
+        for (int i = minNumber.Value; i < maxNumber.Value; i++)
+        {
+            if (selectionCountMap.ContainsKey(i))
+            {
+                selectionCountMap[i] = selectionLimits[i];
+            }
+            else
+            {
+                selectionCountMap.Add(i, selectionLimits[i]);
+            }
+        }
+
+        Debug.Log("リストのサイズを調整しました: " + selectionLimits.Count);
+    }
+
+    public async UniTask LoadSettings()
     {
         string filePath = Path.Combine(Application.persistentDataPath, FileName);
 
         if (File.Exists(filePath))
         {
-            string json = File.ReadAllText(filePath);
+            string json = await File.ReadAllTextAsync(filePath);
             currentSettings = JsonUtility.FromJson<ModalSettings>(json);
         }
         else
         {
-            // デフォルト値で設定を初期化
             currentSettings = new ModalSettings
             {
                 MinValue = defaultMin,
                 MaxValue = defaultMax,
-                ShouldConsume = shouldConsume,
+                ShouldConsume = shouldConsume.Value,
                 AvailableNumbers = new List<int>()
             };
 

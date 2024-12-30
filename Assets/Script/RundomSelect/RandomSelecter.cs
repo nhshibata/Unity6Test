@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
+using R3;
 using System;
-using System.Collections;
+using System.Threading;
 using UnityEngine;
 
 public class RandomSelecter : MonoBehaviour
@@ -9,97 +11,55 @@ public class RandomSelecter : MonoBehaviour
     [SerializeField]
     private RandomSelecterView view;
 
+    private readonly CompositeDisposable disposables = new CompositeDisposable();
+    private CancellationTokenSource cts;
+
 
     private void Awake()
-    {
-        model.LoadSettings();
-        model.Init();
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
     {
         Func<string, char, char> onValidate = (text, addChar) =>
         {
             const int ASCII = 127;
-            // 数字以外の場合は無視
             if (!char.IsDigit(addChar) || addChar > ASCII)
                 return '\0';
-
             return addChar;
         };
 
-        Func<string, int, int, string> onEndEdit = ((input, min, max) =>
+        Func<string, int, int, string> onEndEdit = (input, min, max) =>
         {
-            // 入力欄が空の場合、最低値を設定する
             if (string.IsNullOrEmpty(input))
-            {
                 return min.ToString();
-            }
 
-            // 入力が数値かどうか確認、範囲内であればそのまま返す
             if (int.TryParse(input, out int result))
-            {
-                return input;
-            }
+                return Mathf.Clamp(result, min, max).ToString();
 
             return max.ToString();
-        });
+        };
 
+        model.Init();
+
+        //=============================
+        // イベント登録
+        //=============================
         view.AddMaxListener(
-            () => { model.SetMaxNumber(model.MaxNumber + 1); },
-            () => { model.SetMaxNumber(model.MaxNumber - 1); },
-            () => { return model.MaxNumber.ToString(); },
-            (str, index, addChar) =>
-            {
-                char validatedChar = onValidate(str, addChar);
-                if (validatedChar != '\0')
-                {
-                    // 数値としての有効な入力のみを処理
-                    var newValue = int.Parse(str + validatedChar); // 入力文字列を結合
-                    model.SetMaxNumber(newValue); // Modelに設定
-                    return validatedChar; // 入力を適用
-                }
-                return '\0'; // 無効な入力は無視
-            },
-             (str) =>
-             {
-                 var adjustedValue = onEndEdit(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX);
-                 model.SetMaxNumber(int.Parse(adjustedValue)); // 入力値をModelに適用
-                 return adjustedValue; // 確定値を返す
-             }
-            );
+          () => model.SetMaxNumber(model.MaxNumber.CurrentValue + 1),
+          () => model.SetMaxNumber(model.MaxNumber.CurrentValue - 1),
+          () => model.MaxNumber.CurrentValue.ToString(),
+          (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
+          str => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
+      );
 
         view.AddMinListener(
-            () => { model.SetMinNumber(model.MinNumber + 1); },
-            () => { model.SetMinNumber(model.MinNumber - 1); },
-            () => { return model.MinNumber.ToString(); },
-            (str, index, addChar) =>
-            {
-                char validatedChar = onValidate(str, addChar);
-                if (validatedChar != '\0')
-                {
-                    // 数値としての有効な入力のみを処理
-                    var newValue = int.Parse(str + validatedChar); // 入力文字列を結合
-                    model.SetMinNumber(newValue); // Modelに設定
-                    return validatedChar; // 入力を適用
-                }
-                return '\0'; // 無効な入力は無視
-            },
-            (str) =>
-            {
-                var adjustedValue = onEndEdit(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX);
-                model.SetMinNumber(int.Parse(adjustedValue)); // 入力値をModelに適用
-                return adjustedValue; // 確定値を返す
-            }
-            );
+            () => model.SetMinNumber(model.MinNumber.CurrentValue + 1),
+            () => model.SetMinNumber(model.MinNumber.CurrentValue - 1),
+            () => model.MinNumber.CurrentValue.ToString(),
+            (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
+            str => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
+        );
 
-        view.AddToggleListener((value) =>
-        {
-            model.ShouldConsume = value;
-        });
+        view.AddToggleListener(value => model.ShouldConsume.Value = value);
 
-        view.OnClickStart += ((value) =>
+        view.OnClickStart += async (value) =>
         {
             if (value)
             {
@@ -108,23 +68,40 @@ public class RandomSelecter : MonoBehaviour
 
                 if (model.HasUsableNumbers())
                 {
-                    StopCoroutine("SelectNumber");
-                    StartCoroutine("SelectNumber");
+                    cts = new CancellationTokenSource(); // 新しいトークンを作成
+                    try
+                    {
+                        await SelectNumberAsync(cts.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // キャンセルされた場合の処理
+                        Debug.Log("SelectNumberAsync が安全にキャンセル");
+                    }
+                    catch (Exception ex)
+                    {
+                        // 他の予期しないエラーを処理
+                        Debug.LogError($"予期しないエラー: {ex.Message}");
+                    }
                 }
                 else
                 {
-                    Debug.LogWarning("使用可能な数字がありません。コルーチンは開始されません。");
+                    Debug.LogWarning("使用可能な数字がありません");
                 }
             }
             else
             {
-                // コルーチンが実行中であれば停止
-                StopCoroutine("SelectNumber");
+                cts?.Cancel();
                 model.ConfirmedNumber();
-                view.SetRandomNumberText(model.SelectNumber);
+                view.SetRandomNumberText(model.SelectNumber.CurrentValue);
             }
-        });
+        };
 
+        // ReactiveProperty の監視
+        model.SelectNumber
+            .Skip(1)
+            .Subscribe(value => view.SetRandomNumberText(value))
+            .AddTo(disposables);
     }
 
     private void OnEnable()
@@ -132,25 +109,34 @@ public class RandomSelecter : MonoBehaviour
         model.Init();
     }
 
-    private void OnDisable()
+    private async void OnDisable()
     {
-        model.SaveSettings();
+        try
+        {
+            await model.SaveSettingsAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"SaveSettingsAsync failed: {e}");
+        }
+        disposables.Clear();
     }
 
-    private IEnumerator SelectNumber()
+    private async UniTask SelectNumberAsync(CancellationToken token)
     {
-        while (true)
+        // UniTask.Yield によって非同期タスクがキャンセルされるタイミングでチェックする
+        while (!token.IsCancellationRequested)
         {
-            int select = model.GetRandomNumber();
+            int select = await model.GetRandomNumberAsync();
             if (select == RandomSelecterModel.EXIT_NUMBER)
                 break;
 
-            model.SelectNumber = select;
-            view.SetRandomNumberText(select);
-            yield return null;
+            model.SelectNumber.Value = select;
+
+            // キャンセルのタイミングを確保
+            await UniTask.Yield(token); // tokenを渡すことで非同期処理がキャンセル可能に
         }
 
-        Debug.Log("想定外な終了");
     }
 
 }
