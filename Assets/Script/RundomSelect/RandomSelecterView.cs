@@ -44,7 +44,7 @@ public partial class RandomSelecterView : MonoBehaviour
 
     private void Awake()
     {
-        startButton.Button.onClick.AddListener(ToggleAnimation);
+        startButton.Button.onClick.AddListener(ToggleStartAnimation);
         resetButton.onClick.AddListener(selectionDisplayManager.Reset);
         resetButton.onClick.AddListener(() => { numberText.SetText("-"); });
         shaker.Initialize();
@@ -65,19 +65,19 @@ public partial class RandomSelecterView : MonoBehaviour
         selectionDisplayManager.Reset();
     }
 
-    public void AddMinListener(Action increase, Action decrease, Func<string> displayUpdate = null,
+    public void AddMinListener(Action increase, Action decrease, Func<string> displayUpdate = null, Action<string> onTextChanged = null,
         TMPro.TMP_InputField.OnValidateInput onValidateInput = null, Func<string, string> onEndEdit = null)
     {
-        minSpinButton.AddListener(increase, decrease, displayUpdate, onValidateInput, onEndEdit);
+        minSpinButton.AddListener(increase, decrease, displayUpdate, onTextChanged, onValidateInput, onEndEdit);
     }
     
-    public void AddMaxListener(Action increase, Action decrease, Func<string> displayUpdate = null,
+    public void AddMaxListener(Action increase, Action decrease, Func<string> displayUpdate = null, Action<string> onTextChanged = null,
         TMPro.TMP_InputField.OnValidateInput onValidateInput = null, Func<string, string> onEndEdit = null)
     {
-        maxSpinButton.AddListener(increase, decrease, displayUpdate, onValidateInput, onEndEdit);
+        maxSpinButton.AddListener(increase, decrease, displayUpdate, onTextChanged, onValidateInput, onEndEdit);
     }
 
-    public void AddToggleListener(Action<bool> action)
+    public void AddToggleShouldConsumeListener(Action<bool> action)
     {
         toggle.onValueChanged.AddListener((value) => { 
             action?.Invoke(value);
@@ -94,7 +94,7 @@ public partial class RandomSelecterView : MonoBehaviour
         selectionDisplayManager.SetHistoryNumbers(ret, selectCount);
     }
 
-    private void ToggleAnimation()
+    private void ToggleStartAnimation()
     {
         if (shaker.IsShaking())
         {
@@ -149,6 +149,11 @@ public partial class RandomSelecterView : MonoBehaviour
     public void SetRandomNumberText(int value)
     {
         numberText.SetText(value.ToString());
+    }
+
+    public void SetToggleStateShouldConsume(bool value)
+    {
+        toggle.SetIsOnWithoutNotify(value);
     }
 
     public void AddPrevNumber(int value)

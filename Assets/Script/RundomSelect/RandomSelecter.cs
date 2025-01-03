@@ -21,23 +21,28 @@ public class RandomSelecter : MonoBehaviour
         // イベント登録
         //=============================
         view.AddMaxListener(
-          () => model.SetMaxNumber(model.MaxNumber.CurrentValue + 1),
-          () => model.SetMaxNumber(model.MaxNumber.CurrentValue - 1),
-          () => model.MaxNumber.CurrentValue.ToString(),
-          (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
-          (str) => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
+            () => model.SetMaxNumber(model.MaxNumber.CurrentValue + 1),
+            () => model.SetMaxNumber(model.MaxNumber.CurrentValue - 1),
+            () => model.MaxNumber.CurrentValue.ToString(),
+            (str) => model.SetMaxNumber(int.Parse(str)),
+            (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
+            (str) => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
         );
 
         view.AddMinListener(
             () => model.SetMinNumber(model.MinNumber.CurrentValue + 1),
             () => model.SetMinNumber(model.MinNumber.CurrentValue - 1),
             () => model.MinNumber.CurrentValue.ToString(),
+            (str) => model.SetMinNumber(int.Parse(str)),
             (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
             (str) => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
         );
 
-        view.AddToggleListener(value => model.ShouldConsume.Value = value);
-        view.AddResetButtonListener(() => { model.Reset(); });
+        view.AddToggleShouldConsumeListener(value => model.ShouldConsume.Value = value);
+        view.AddResetButtonListener(() => { 
+            model.Reset();
+            view.SetGuideText(model.GetUsableNumbersCount()); 
+        });
         view.SetHistoryNumbers((fifo, order) => model.GetSelectionsInOrder(fifo, order), () => model.GetSelectionCount());
 
         view.OnClickStart += async (value) =>
@@ -101,6 +106,7 @@ public class RandomSelecter : MonoBehaviour
             .Subscribe(min =>
             {
                 view.SetMinText(min);
+                view.SetGuideText(model.GetUsableNumbersCount());
             })
             .AddTo(disposables);
 
@@ -109,8 +115,14 @@ public class RandomSelecter : MonoBehaviour
             .Subscribe(max =>
             {
                 view.SetMaxText(max);
+                view.SetGuideText(model.GetUsableNumbersCount());
             })
             .AddTo(disposables);
+
+        model.ShouldConsume
+            .Skip(1)
+            .Subscribe(shouldConsume => { view.SetToggleStateShouldConsume(shouldConsume); })
+            .AddTo (disposables);
 
         // ロード時の一度だけ設定
         model.OnLoadComplete += () => { view.SetGuideText(model.GetUsableNumbersCount()); };
@@ -119,6 +131,7 @@ public class RandomSelecter : MonoBehaviour
     private void OnEnable()
     {
         model.Init();
+        view.SetGuideText(model.GetUsableNumbersCount());
     }
 
     private async void OnDisable()

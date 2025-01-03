@@ -23,7 +23,7 @@ public class RandomSelecterModel
     }
 
     public const int RANGE_MIN = 0;
-    public const int RANGE_MAX = 999;
+    public const int RANGE_MAX = 1000;
     public const int EXIT_NUMBER = -1;
     private const string FileName = "ModalSettings.json";
 
@@ -57,30 +57,6 @@ public class RandomSelecterModel
 
     public void Init()
     {
-        OnLoadComplete += () =>
-        {
-            if (selectionLimits.Count < maxNumber.Value)
-            {
-                for (int i = selectionLimits.Count; i < maxNumber.Value; i++)
-                {
-                    selectionLimits.Add(1);
-                }
-            }
-
-            Debug.Log("リストサイズ" + selectionLimits.Count);
-            //for (int i = minNumber.Value; i <= maxNumber.Value; i++)
-            //{
-            //    if (selectionCountMap.ContainsKey(i))
-            //    {
-            //        selectionCountMap[i] = selectionLimits[i];
-            //    }
-            //    else
-            //    {
-            //        selectionCountMap.Add(i, selectionLimits[i]);
-            //    }
-            //}
-        };
-
         LoadSettings().Forget();
         queuedSelections.Clear();
 
@@ -91,7 +67,12 @@ public class RandomSelecterModel
 
     public void Reset()
     {
-        Init();
+        AdjustListSize();
+        queuedSelections.Clear();
+
+        // 既存の購読を解除してから新しい購読を登録
+        selectNumberSubscription?.Dispose();
+        selectNumberSubscription = prevNumber.Skip(1).Subscribe(value => { queuedSelections.Add(value); });
     }
 
     /// <summary>
@@ -107,13 +88,25 @@ public class RandomSelecterModel
     /// </summary>
     public int GetUsableNumbersCount()
     {
+        if (selectionCountMap.Count == 0)
+            return 0;
+
+        // 最小値と最大値の取得
+        var minKey = selectionCountMap.Keys.Min();
+        var maxKey = selectionCountMap.Keys.Max();
+
         int usableCount = 0;
+
+        // minKeyとmaxKeyの間のキーをチェック
         foreach (var kvp in selectionCountMap)
         {
-            if (kvp.Value > 0)  // 数字が使える場合のみカウント
+            if (kvp.Key < minKey && kvp.Key > maxKey)
+                continue;
+            
+            if(kvp.Value > 0)
                 usableCount++;
         }
-        Debug.Log($"{selectionCountMap.First().Key}:{selectionCountMap.Last().Key}");
+
         return usableCount;
     }
 

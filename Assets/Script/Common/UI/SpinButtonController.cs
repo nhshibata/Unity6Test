@@ -20,7 +20,7 @@ public class SpinButtonController : SpinButton
     /// <param name="decrease">減少</param>
     /// <param name="displayUpdate">TMPへ反映させたい文</param>
     /// <param name="onValidateInput">TMP_InputFieldへの入力時制限</param>
-    public void AddListener(Action increase, Action decrease, Func<string> displayUpdate = null,
+    public void AddListener(Action increase, Action decrease, Func<string> displayUpdate = null, Action<string> onTextChanged = null,
         TMPro.TMP_InputField.OnValidateInput onValidateInput = null, Func<string, string> onEndEdit = null)
     {
         if (displayUpdate != null)
@@ -30,14 +30,27 @@ public class SpinButtonController : SpinButton
         }
 
         if (onValidateInput != null)
+        {
             displayInput.onValidateInput += onValidateInput;
+        }
 
         if (onEndEdit != null)
         {
             displayInput.onEndEdit.AddListener((x) =>
             {
-                if (displayInput != null)
-                    displayInput.text = onEndEdit(x);
+                displayInput.text = onEndEdit(x);
+            });
+        }
+
+        if (onTextChanged != null)
+        {
+            displayInput.onValueChanged.AddListener((newText) =>
+            {
+                onTextChanged(newText);
+                if (displayUpdateCallback != null)
+                {
+                    displayInput.text = displayUpdateCallback();
+                }
             });
         }
 
@@ -63,6 +76,10 @@ public class SpinButtonController : SpinButton
         decreaseButton.onClick.AddListener(onDecreaseAction);
     }
 
+    /// <summary>
+    /// 直接Textを変更
+    /// </summary>
+    /// <param name="text"></param>
     public void SetText(string text)
     {
         displayInput.text = text;
