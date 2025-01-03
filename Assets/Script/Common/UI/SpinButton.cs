@@ -20,7 +20,7 @@ public class SpinButton : MonoBehaviour
     private EventTrigger decreaseTrigger = null;
 
     [SerializeField, Tooltip("加速が開始されるまでの時間")]
-    private float accelerationThreshold = 1f;
+    private float accelerationThreshold = 1.0f;
     [SerializeField, Tooltip("加速後の繰り返し処理の間隔")]
     private float repeatRate = 0.1f;
 
@@ -30,7 +30,7 @@ public class SpinButton : MonoBehaviour
     private bool isIncreaseButtonHeld = false;
     private bool isDecreaseButtonHeld = false;
 
-    private float holdTime = 0f;
+    private float holdTime = 0.0f;
 
 
     private void Start()
@@ -118,24 +118,24 @@ public class SpinButton : MonoBehaviour
     protected void StartIncreaseHold(BaseEventData baseEvent)
     {
         isIncreaseButtonHeld = true;
-        holdTime = 0f;
+        holdTime = 0.0f;
     }
 
     protected void StopIncreaseHold(BaseEventData baseEvent)
     {
         isIncreaseButtonHeld = false;
-        holdTime = 0f;
+        holdTime = 0.0f;
     }
 
     protected void StartDecreaseHold(BaseEventData baseEvent)
     {
         isDecreaseButtonHeld = true;
-        holdTime = 0f;
+        holdTime = 0.0f;
     }
 
     protected void StopDecreaseHold(BaseEventData baseEvent)
     {
         isDecreaseButtonHeld = false;
-        holdTime = 0f;
+        holdTime = 0.0f;
     }
 }

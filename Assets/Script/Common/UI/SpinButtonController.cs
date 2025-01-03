@@ -63,4 +63,9 @@ public class SpinButtonController : SpinButton
         decreaseButton.onClick.AddListener(onDecreaseAction);
     }
 
+    public void SetText(string text)
+    {
+        displayInput.text = text;
+    }
+
 }

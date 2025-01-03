@@ -81,7 +81,6 @@ public class RandomSelecter : MonoBehaviour
             .Skip(1)
             .Subscribe(current =>
             {
-                // 必要に応じて処理
                 view.SetRandomNumberText(current);
             })
             .AddTo(disposables);
@@ -93,6 +92,22 @@ public class RandomSelecter : MonoBehaviour
             {
                 Debug.Log($"前の値: {pair.Previous}, 現在の値: {pair.Current}");
                 view.AddPrevNumber(pair.Previous);
+            })
+            .AddTo(disposables);
+
+        model.MinNumber
+            .Skip(1)
+            .Subscribe(min =>
+            {
+                view.SetMinText(min);
+            })
+            .AddTo(disposables);
+
+        model.MaxNumber
+            .Skip(1)
+            .Subscribe(max =>
+            {
+                view.SetMaxText(max);
             })
             .AddTo(disposables);
     }

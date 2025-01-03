@@ -244,6 +244,15 @@ public class RandomSelecterModel
     {
         string filePath = Path.Combine(Application.persistentDataPath, FileName);
 
+        // 現在の設定を反映
+        currentSettings = new ModalSettings
+        {
+            MinValue = minNumber.Value,
+            MaxValue = maxNumber.Value,
+            ShouldConsume = shouldConsume.Value,
+            AvailableNumbers = new List<int>(this.selectionLimits)
+        }; 
+
         string json = JsonUtility.ToJson(currentSettings, true);
         await File.WriteAllTextAsync(filePath, json);
 
@@ -305,7 +314,12 @@ public class RandomSelecterModel
             }
         }
 
-        Debug.Log($"Loaded Settings: Min={currentSettings.MinValue}, Max={currentSettings.MaxValue}, List={string.Join(", ", currentSettings.AvailableNumbers)}");
+        SetMinNumber(currentSettings.MinValue);
+        SetMaxNumber(currentSettings.MaxValue);
+        shouldConsume.Value = currentSettings.ShouldConsume;
+        selectionLimits = new ObservableList<int>(currentSettings.AvailableNumbers);
+
+        Debug.Log($"Loaded Settings :{filePath}: Min={currentSettings.MinValue}, Max={currentSettings.MaxValue}, List={string.Join(", ", currentSettings.AvailableNumbers)}");
     }
 
 }

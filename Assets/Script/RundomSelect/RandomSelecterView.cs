@@ -124,6 +124,16 @@ public partial class RandomSelecterView : MonoBehaviour
         startButton.Text.text = "Start";
     }
 
+    public void SetMinText(int min)
+    {
+        minSpinButton.SetText(min.ToString());
+    }
+
+    public void SetMaxText(int max)
+    {
+        maxSpinButton.SetText(max.ToString());
+    }
+
     public void SetRandomNumberText(int value)
     {
         numberText.text = value.ToString();
