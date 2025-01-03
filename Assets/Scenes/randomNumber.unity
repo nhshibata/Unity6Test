@@ -3434,6 +3434,7 @@ GameObject:
   - component: {fileID: 1138222200}
   - component: {fileID: 1138222202}
   - component: {fileID: 1138222201}
+  - component: {fileID: 1138222203}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -3473,7 +3474,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 1881444051a55e44aa5f113395fd79ef, type: 2}
   m_Color: {r: 0.42475083, g: 0.65059155, b: 0.7830189, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3499,6 +3500,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1138222199}
   m_CullTransparentMesh: 1
+--- !u!114 &1138222203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138222199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9063d19e06cec46929e0a5f0b0462a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scanLineJitter: 0.09
+  _JitterSize: 1
+  _verticalJump: 0
+  _horizontalShake: 0
+  _colorDrift: -1.69
+  _ScanlineColor: {r: 0.9528302, g: 0.9528302, b: 0.9528302, a: 0}
+  _ScanlineSize: 0.26
+  _ColorStrength: 5
 --- !u!1 &1165103269
 GameObject:
   m_ObjectHideFlags: 0
@@ -3673,6 +3694,7 @@ GameObject:
   - component: {fileID: 1262034100}
   - component: {fileID: 1262034102}
   - component: {fileID: 1262034101}
+  - component: {fileID: 1262034103}
   m_Layer: 5
   m_Name: Image (2)
   m_TagString: Untagged
@@ -3712,7 +3734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 1881444051a55e44aa5f113395fd79ef, type: 2}
   m_Color: {r: 0.42475083, g: 0.65059155, b: 0.7830189, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3738,6 +3760,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1262034099}
   m_CullTransparentMesh: 1
+--- !u!114 &1262034103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262034099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9063d19e06cec46929e0a5f0b0462a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scanLineJitter: 0.09
+  _JitterSize: 1
+  _verticalJump: 0
+  _horizontalShake: 0
+  _colorDrift: -1.69
+  _ScanlineColor: {r: 0.9528302, g: 0.9528302, b: 0.9528302, a: 0}
+  _ScanlineSize: 0.26
+  _ColorStrength: 5
 --- !u!1 &1277987151
 GameObject:
   m_ObjectHideFlags: 0
@@ -4164,6 +4206,7 @@ GameObject:
   - component: {fileID: 1522114913}
   - component: {fileID: 1522114915}
   - component: {fileID: 1522114914}
+  - component: {fileID: 1522114916}
   m_Layer: 5
   m_Name: Image (1)
   m_TagString: Untagged
@@ -4203,7 +4246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 1881444051a55e44aa5f113395fd79ef, type: 2}
   m_Color: {r: 0.42475083, g: 0.65059155, b: 0.7830189, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -4229,6 +4272,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1522114912}
   m_CullTransparentMesh: 1
+--- !u!114 &1522114916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1522114912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9063d19e06cec46929e0a5f0b0462a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scanLineJitter: 0.09
+  _JitterSize: 1
+  _verticalJump: 0
+  _horizontalShake: 0
+  _colorDrift: -1.69
+  _ScanlineColor: {r: 0.9528302, g: 0.9528302, b: 0.9528302, a: 0}
+  _ScanlineSize: 0.26
+  _ColorStrength: 5
 --- !u!1 &1538537302
 GameObject:
   m_ObjectHideFlags: 0
