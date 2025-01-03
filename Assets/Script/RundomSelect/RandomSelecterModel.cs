@@ -80,7 +80,7 @@ public class RandomSelecterModel
 
         // 既存の購読を解除してから新しい購読を登録
         selectNumberSubscription?.Dispose();
-        selectNumberSubscription = prevNumber.Skip(1).Subscribe(value => queuedSelections.Add(value));
+        selectNumberSubscription = prevNumber.Skip(1).Subscribe(value => { queuedSelections.Add(value); Debug.Log($"{value.ToString()}"); });
     }
 
     public void Reset()
@@ -143,9 +143,9 @@ public class RandomSelecterModel
 
     public bool IsSelect(int index)
     {
-        if (index - 1 < 0 || index - 1 >= selectionLimits.Count)
+        if (index < 0 || index > selectionLimits.Count)
         {
-            Debug.LogError($"無効なインデックス: {index}");
+            Debug.LogAssertion($"無効なインデックス: {index}");
             return false;
         }
 
@@ -262,19 +262,21 @@ public class RandomSelecterModel
     private void AdjustListSize()
     {
         // list のサイズを maxNumber に合わせて拡張
-        while (selectionLimits.Count < maxNumber.Value)
+        while (selectionLimits.Count < maxNumber.Value + 1)
         {
             selectionLimits.Add(1); // デフォルト値（例：1）で埋める
         }
 
-        // list のサイズを minNumber に合わせて縮小
-        while (selectionLimits.Count > maxNumber.Value)
+        // list のサイズを maxNumber に合わせて縮小 (同様に maxNumber.Value + 1)
+        while (selectionLimits.Count > maxNumber.Value + 1)
         {
             selectionLimits.RemoveAt(selectionLimits.Count - 1); // 不要な要素を削除
         }
 
+        Debug.Log("リストのサイズを調整しました: " + selectionLimits.Count);
+
         // map を再設定（list に合わせる）
-        for (int i = minNumber.Value; i < maxNumber.Value; i++)
+        for (int i = minNumber.Value; i < maxNumber.Value + 1; i++) // maxNumber を含めるために <= を使用
         {
             if (selectionCountMap.ContainsKey(i))
             {
@@ -286,7 +288,6 @@ public class RandomSelecterModel
             }
         }
 
-        Debug.Log("リストのサイズを調整しました: " + selectionLimits.Count);
     }
 
     public async UniTask LoadSettings()
