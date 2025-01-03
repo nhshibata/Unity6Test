@@ -57,6 +57,7 @@ public class RandomSelecter : MonoBehaviour
                         Debug.Log($"SelectNumberAsync が安全にキャンセル{model.SelectNumber.CurrentValue}で終了");
                         view.SetRandomNumberText(model.SelectNumber.CurrentValue);
                         model.ConfirmedNumber();
+                        view.SetGuideText(model.GetUsableNumbersCount());
                     }
                     catch (Exception ex)
                     {
@@ -110,6 +111,9 @@ public class RandomSelecter : MonoBehaviour
                 view.SetMaxText(max);
             })
             .AddTo(disposables);
+
+        // ロード時の一度だけ設定
+        model.OnLoadComplete += () => { view.SetGuideText(model.GetUsableNumbersCount()); };
     }
 
     private void OnEnable()

@@ -8,7 +8,8 @@ using UnityEngine.UI;
 public partial class RandomSelecterView : MonoBehaviour
 {
     private const int DEFAULT_FACE = 0;
-
+    
+    [Header("References")]
     [SerializeField]
     private SpinButtonController minSpinButton;
     [SerializeField]
@@ -22,13 +23,17 @@ public partial class RandomSelecterView : MonoBehaviour
     [SerializeField]
     private TMP_Text numberText = null;
     [SerializeField]
+    private TMP_Text guideText = null;
+    [SerializeField]
     private ImageShaker shaker = null;
+    [Header("Rotate")]
     [SerializeField] 
     private RectTransform target = null;
     [SerializeField] 
     private float rotationDuration = 50.0f;
     [SerializeField]
     private SelectionDisplayManager selectionDisplayManager = null;
+    [Header("Character Sprite")]
     [SerializeField]
     private List<Sprite> charSprites = new List<Sprite>();
 
@@ -40,6 +45,8 @@ public partial class RandomSelecterView : MonoBehaviour
     private void Awake()
     {
         startButton.Button.onClick.AddListener(ToggleAnimation);
+        resetButton.onClick.AddListener(selectionDisplayManager.Reset);
+        resetButton.onClick.AddListener(() => { numberText.SetText("-"); });
         shaker.Initialize();
     }
 
@@ -110,7 +117,7 @@ public partial class RandomSelecterView : MonoBehaviour
             .SetEase(Ease.Linear)
             .SetLoops(-1, LoopType.Restart);
 
-        startButton.Text.text = "Stop";
+        startButton.Text.SetText("Stop");
     }
 
     private void StopRandomAnimation()
@@ -121,7 +128,7 @@ public partial class RandomSelecterView : MonoBehaviour
         rotateTween?.Kill();
         rotateTween = null;
 
-        startButton.Text.text = "Start";
+        startButton.Text.SetText("Start");
     }
 
     public void SetMinText(int min)
@@ -134,9 +141,14 @@ public partial class RandomSelecterView : MonoBehaviour
         maxSpinButton.SetText(max.ToString());
     }
 
+    public void SetGuideText(int remainingTries)
+    {
+        guideText.SetText($"Remaining tries\n{remainingTries}");
+    }
+
     public void SetRandomNumberText(int value)
     {
-        numberText.text = value.ToString();
+        numberText.SetText(value.ToString());
     }
 
     public void AddPrevNumber(int value)
