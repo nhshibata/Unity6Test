@@ -17,27 +17,6 @@ public class RandomSelecter : MonoBehaviour
 
     private void Awake()
     {
-        Func<string, char, char> onValidate = (text, addChar) =>
-        {
-            const int ASCII = 127;
-            if (!char.IsDigit(addChar) || addChar > ASCII)
-                return '\0';
-            return addChar;
-        };
-
-        Func<string, int, int, string> onEndEdit = (input, min, max) =>
-        {
-            if (string.IsNullOrEmpty(input))
-                return min.ToString();
-
-            if (int.TryParse(input, out int result))
-                return Mathf.Clamp(result, min, max).ToString();
-
-            return max.ToString();
-        };
-
-        model.Init();
-
         //=============================
         // イベント登録
         //=============================
@@ -46,7 +25,7 @@ public class RandomSelecter : MonoBehaviour
           () => model.SetMaxNumber(model.MaxNumber.CurrentValue - 1),
           () => model.MaxNumber.CurrentValue.ToString(),
           (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
-          str => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
+          (str) => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
         );
 
         view.AddMinListener(
@@ -54,7 +33,7 @@ public class RandomSelecter : MonoBehaviour
             () => model.SetMinNumber(model.MinNumber.CurrentValue - 1),
             () => model.MinNumber.CurrentValue.ToString(),
             (str, index, addChar) => InputFieldValidator.ValidateDigitOnly(str, addChar),
-            str => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
+            (str) => InputFieldValidator.ClampInputToRange(str, RandomSelecterModel.RANGE_MIN, RandomSelecterModel.RANGE_MAX)
         );
 
         view.AddToggleListener(value => model.ShouldConsume.Value = value);
