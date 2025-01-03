@@ -1,0 +1,1 @@
+https://github.com/applibot-inc/sync2022-ui-sample-techbot/blob/main/Assets/Samples/Glitch/Glitch.shader
