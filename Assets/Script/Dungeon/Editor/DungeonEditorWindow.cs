@@ -97,9 +97,13 @@ public class DungeonEditorWindow : EditorWindow
 
     private void PopulateDungeonData()
     {
-        if (dataPopulator == null)
+        dataPopulator = new DungeonDataPopulator();
+        if (!string.IsNullOrEmpty(fileName))
         {
-            Debug.LogError("ダンジョンが生成されていません");
+            dataPopulator.LoadMapFromCsv(fileName);
+        }
+        else
+        {
             return;
         }
 
@@ -109,16 +113,13 @@ public class DungeonEditorWindow : EditorWindow
             return;
         }
 
+        Debug.Log($"マップに設置:{maptipsList.GetList().Count}");
         foreach (var maptips in maptipsList.GetList())
         {
             if (maptips == null)
                 continue;
 
-            int numToPlace = Mathf.Max(maptips.GetMinCount(), maptips.GetCount());
-            for (int i = 0; i < numToPlace; i++)
-            {
-                dataPopulator.PlaceItemsInRooms(maptips.GetType(), maptips.GetMinCount(), maptips.GetCount());
-            }
+            dataPopulator.PlaceItemsInRooms(maptips.GetType(), maptips.GetCount(), maptips.GetMinCount());
         }
 
         dataPopulator.SaveToCsv(fileName);

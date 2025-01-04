@@ -58,7 +58,16 @@ public class MapGeneratorEditorWindow : EditorWindow
     {
         string[] lines = File.ReadAllLines(csvFilePath);
 
+        // GameObjectをマップの親オブジェクトとして作成
         GameObject mapParent = new GameObject("GeneratedMap");
+
+        // マップのサイズ（行数と列数）を計算
+        int mapWidth = lines[0].Length;
+        int mapHeight = lines.Length;
+
+        // マップの中心を (0, 0, 0) に合わせるためのオフセット
+        float offsetX = mapWidth / 2f;
+        float offsetZ = mapHeight / 2f;
 
         for (int y = 0; y < lines.Length; y++)
         {
@@ -69,23 +78,32 @@ public class MapGeneratorEditorWindow : EditorWindow
             {
                 char tile = line[x];
 
+                // タイルに対応するPrefabを取得
                 GameObject prefab = selectedTileConfig.GetGameObjectForTile(tile);
 
                 if (prefab != null)
                 {
+                    // Prefabをインスタンス化
                     GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                    instance.transform.position = new Vector3(x, 0, -y);
+
+                    // 座標を設定 (x, 0, -z)にすることで、マップ中央が (0, 0, 0) になる
+                    instance.transform.position = new Vector3(x - offsetX, 0, -(y - offsetZ));
+
+                    // 親オブジェクトを設定
                     instance.transform.SetParent(mapParent.transform);
                 }
                 else
                 {
+                    // Prefabが設定されていない場合は警告
                     Debug.LogWarning($"{tile}のprefabが設定されていません");
                 }
             }
         }
 
+        // マップ生成成功のログ
         Debug.Log("マップ生成成功");
     }
+
 }
 
 #endif

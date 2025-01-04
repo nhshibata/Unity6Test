@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
+using static DungeonGenerator;
 
 public class DungeonDataPopulator
 {
@@ -35,69 +37,131 @@ public class DungeonDataPopulator
 
     public void PlaceItemsInRooms(int type, int count, int minCount)
     {
-        var validRooms = GetRoomsWithFloor();
+        // 部屋ごとの床座標リストを取得
+        var validRooms = GetRooms();
 
-        int placedCount = 0;
-        int targetCount = Math.Max(minCount, Math.Min(count, validRooms.Count));
+        int targetCount = Math.Max(minCount, Math.Min(count, validRooms.Sum(room => room.Count)));
+
+        Debug.Log($"{type}を{targetCount}個配置");
 
         for (int i = 0; i < targetCount; i++)
         {
             if (validRooms.Count == 0)
                 break;
 
+            // ランダムな部屋を選択
             var roomIndex = random.Next(validRooms.Count);
             var room = validRooms[roomIndex];
 
-            // 部屋内のランダム位置を取得
-            var position = room[random.Next(room.Count)];
-            map[position.y, position.x] = (char)type;
-            room.Remove(position);
+            Debug.Log($"{roomIndex}番号{validRooms.Count}部屋");
 
+            // ランダムな部屋内座標を選択
+            var tileIndex = random.Next(room.Count);
+            var position = room[tileIndex];
+
+            // アイテムを配置
+            map[position.y, position.x] = (char)('0' + type);
+
+            // 配置したタイルを削除
+            room.RemoveAt(tileIndex);
+
+            // 部屋内の床タイルがなくなった場合、その部屋を削除
             if (room.Count == 0)
+            {
                 validRooms.RemoveAt(roomIndex);
-
-            placedCount++;
-        }
-
-        // 残り数をランダムな部屋に配置
-        while (placedCount < count)
-        {
-            if (validRooms.Count == 0)
-                validRooms = GetRoomsWithFloor();
-
-            var roomIndex = random.Next(validRooms.Count);
-            var room = validRooms[roomIndex];
-            var position = room[random.Next(room.Count)];
-            map[position.y, position.x] = (char)type;
-            room.Remove(position);
-
-            if (room.Count == 0)
-                validRooms.RemoveAt(roomIndex);
-
-            placedCount++;
+            }
         }
     }
 
-    private List<List<(int x, int y)>> GetRoomsWithFloor()
+    private List<List<(int x, int y)>> GetRooms()
     {
         var rooms = new List<List<(int x, int y)>>();
+        var visited = new HashSet<(int x, int y)>();
 
-        var visited = new bool[mapHeight, mapWidth];
-        for (int y = 0; y < mapHeight; y++)
+        for (int y = 0; y < map.GetLength(0); y++)
         {
-            for (int x = 0; x < mapWidth; x++)
+            for (int x = 0; x < map.GetLength(1); x++)
             {
-                if (map[y, x] == '.' && !visited[y, x])
+                // 外周タイル（RoomOuter）を検出
+                if (DungeonBaseTip.IsMatch(map[y, x], DungeonBaseTip.Tip.RoomOuter) && !visited.Contains((x, y)))
                 {
-                    var room = new List<(int x, int y)>();
-                    ExploreRoom(x, y, visited, room);
-                    if (room.Count > 0)
-                        rooms.Add(room);
+                    // 部屋を特定
+                    var roomBounds = GetRoomBounds(x, y, visited);
+                    var roomTiles = CollectInnerTiles(roomBounds);
+
+                    if (roomTiles.Count > 0)
+                    {
+                        rooms.Add(roomTiles);
+                    }
                 }
             }
         }
 
         return rooms;
+    }
+
+    private RectInt GetRoomBounds(int startX, int startY, HashSet<(int x, int y)> visited)
+    {
+        int minX = startX, maxX = startX;
+        int minY = startY, maxY = startY;
+        var queue = new Queue<(int x, int y)>();
+        queue.Enqueue((startX, startY));
+        visited.Add((startX, startY));
+
+        while (queue.Count > 0)
+        {
+            var (x, y) = queue.Dequeue();
+
+            // 範囲を更新
+            minX = Math.Min(minX, x);
+            maxX = Math.Max(maxX, x);
+            minY = Math.Min(minY, y);
+            maxY = Math.Max(maxY, y);
+
+            // 隣接する外周タイルを探索
+            var directions = new (int dx, int dy)[] { (0, 1), (1, 0), (0, -1), (-1, 0) };
+            foreach (var (dx, dy) in directions)
+            {
+                int newX = x + dx;
+                int newY = y + dy;
+
+                if (IsInsideMap(newX, newY) &&
+                    DungeonBaseTip.IsMatch(map[newY, newX], DungeonBaseTip.Tip.RoomOuter) &&
+                    !visited.Contains((newX, newY)))
+                {
+                    queue.Enqueue((newX, newY));
+                    visited.Add((newX, newY));
+                }
+            }
+        }
+
+        // 長方形の範囲を返す
+        return new RectInt(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
+    private List<(int x, int y)> CollectInnerTiles(RectInt roomBounds)
+    {
+        var innerTiles = new List<(int x, int y)>();
+
+        for (int y = roomBounds.yMin + 1; y < roomBounds.yMax; y++)
+        {
+            for (int x = roomBounds.xMin + 1; x < roomBounds.xMax; x++)
+            {
+                if (DungeonBaseTip.IsMatch(map[y, x], DungeonBaseTip.Tip.RoomInner))
+                {
+                    innerTiles.Add((x, y));
+                }
+            }
+        }
+
+        return innerTiles;
+    }
+
+
+
+    private bool IsInsideMap(int x, int y)
+    {
+        return x >= 0 && x < map.GetLength(1) && y >= 0 && y < map.GetLength(0);
     }
 
     private void ExploreRoom(int x, int y, bool[,] visited, List<(int x, int y)> room)
@@ -140,6 +204,7 @@ public class DungeonDataPopulator
                 writer.WriteLine();
             }
         }
+        Debug.Log($"Dungeon saved to CSV: {newFileName}");
     }
 
     private string GetSavePath(string fileName)
