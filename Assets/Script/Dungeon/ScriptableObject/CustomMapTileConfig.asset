@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d74b41a264abe5242962b0fe5d01822b, type: 3}
+  m_Name: CustomMapTileConfig
+  m_EditorClassIdentifier: 
+  wallPrefab: {fileID: 2028174244921448824, guid: 91b42343685256044a2dbd074e9aeefb, type: 3}
+  pathPrefab: {fileID: 8010704400443685005, guid: f3626e002deda2745b4d62dfbf62ce84, type: 3}
+  roomOuterPrefab: {fileID: 8995391930911204913, guid: 4282d1d4e028a7648b0023f3cfe48bef, type: 3}
+  roomInnerPrefab: {fileID: 6719242057628184520, guid: e3fe22d5a7986ba419843eab5cd4a13e, type: 3}
+  customTilePrefabs:
+    pairs:
+    - key: 0
+      value: {fileID: 0}
+    - key: 1
+      value: {fileID: 0}
+    - key: 2
+      value: {fileID: 0}
