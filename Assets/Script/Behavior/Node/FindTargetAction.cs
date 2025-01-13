@@ -22,7 +22,6 @@ public partial class FindTargetAction : Action
     {
         Target.Value = targetDetector.Value.CurrentTarget.Value;
 
-        // 子ノードが有効な間は毎フレーム実行
         return Target.Value != null ?
             Status.Success :
             Status.Failure;
