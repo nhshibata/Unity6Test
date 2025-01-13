@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
-  m_Name: TextNavMesh Blackboard
+  m_Name: TetChase Blackboard
   m_EditorClassIdentifier: 
   AssetID:
-    m_Value0: 0
-    m_Value1: 0
+    m_Value0: 4921331589411752198
+    m_Value1: 10758259306921224456
   m_Variables:
   - rid: 6443050478043136338
   - rid: 6443050478043136612
@@ -88,7 +88,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db920e62f70f420bb33c771449926fa4, type: 3}
-  m_Name: TextNavMesh
+  m_Name: TetChase
   m_EditorClassIdentifier: 
   Graphs:
   - rid: 6443050478918172848
@@ -106,7 +106,7 @@ MonoBehaviour:
         AuthoringAssetID:
           m_Value0: 4921331589411752198
           m_Value1: 10758259306921224456
-        m_DebugInfo: {fileID: 0}
+        m_DebugInfo: {fileID: 9064524105317421343}
         Root:
           rid: 6443050478918172849
         BlackboardReference:
@@ -404,7 +404,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
-  m_Name: TextNavMesh Blackboard
+  m_Name: TetChase Blackboard
   m_EditorClassIdentifier: 
   VersionTimestamp: 638723816551142913
   AssetID:
@@ -471,7 +471,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bad8f2220607dac4db5082ff333fafb8, type: 3}
-  m_Name: TextNavMesh
+  m_Name: TetChase
   m_EditorClassIdentifier: 
   Blackboard: {fileID: -8465247092535799711}
   m_Description: 
@@ -1483,6 +1483,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b27bb6d9a2c8d540a10dff10acc543e, type: 3}
-  m_Name: TextNavMesh Debug Info
+  m_Name: TetChase Debug Info
   m_EditorClassIdentifier: 
   m_CodeBreakPointsList: []
