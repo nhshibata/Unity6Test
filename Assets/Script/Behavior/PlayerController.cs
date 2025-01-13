@@ -1,15 +1,14 @@
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : ActionCharacter
 {
     [SerializeField]
     private Animator animator;
     [SerializeField]
     private float moveSpeed = 5.0f; // 移動速度
     [SerializeField]
-    private Rigidbody rb;
-    [SerializeField]
     private float rotationSpeed = 10.0f; // 回転速度
+
 
     void Update()
     {

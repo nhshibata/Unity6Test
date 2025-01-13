@@ -14,7 +14,6 @@ public partial class AttackAction : Action
     protected override Status OnStart()
     {
         // アニメーションを再生
-        Debug.Log($"アニメーションを再生{StateName.Value}");
         Anim.Value.Play(StateName.Value);
         return Status.Success;
     }

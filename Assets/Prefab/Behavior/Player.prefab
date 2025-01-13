@@ -291,9 +291,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1df11dcc6c1385469d1ade32b0cd7dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 6297107366372779835}
+  targetName: Enemy
+  knockBackPower: 1
   animator: {fileID: 516707661187693617}
   moveSpeed: 6
-  rb: {fileID: 6297107366372779835}
   rotationSpeed: 10
 --- !u!1001 &9214902280908768574
 PrefabInstance:
