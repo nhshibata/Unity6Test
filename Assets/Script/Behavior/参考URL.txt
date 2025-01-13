@@ -1,2 +1,8 @@
+// ブログ
 https://qiita.com/tsubaki_t1/items/8d09112378ec188ba752
 https://orotiyamatano.hatenablog.com/entry/Behavior
+https://light11.hatenadiary.com/entry/2024/11/27/193021
+// リファレンス
+https://docs.unity3d.com/Packages/com.unity.behavior@1.0/manual/index.html
+// youtube
+https://www.youtube.com/watch?v=n5m2aI6Wk8E
