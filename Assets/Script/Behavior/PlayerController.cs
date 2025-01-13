@@ -1,12 +1,13 @@
-using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5.0f; // 移動速度
-    public float rotationSpeed = 10.0f; // 回転速度
+    [SerializeField]
+    private Animator animator;
+    [SerializeField]
+    private float moveSpeed = 5.0f; // 移動速度
+    [SerializeField]
+    private float rotationSpeed = 10.0f; // 回転速度
 
     void Update()
     {
@@ -17,15 +18,15 @@ public class PlayerController : MonoBehaviour
 
         // カメラの右方向を取得（XZ 平面のみ）
         Vector3 cameraRight = Camera.main.transform.right;
-        cameraRight.y = 0; // 上下成分を無視
+        cameraRight.y = 0;
         cameraRight.Normalize();
 
         // 入力による移動方向の計算
         Vector3 moveDirection = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) moveDirection += cameraForward; // 前進
-        if (Input.GetKey(KeyCode.S)) moveDirection -= cameraForward; // 後退
-        if (Input.GetKey(KeyCode.A)) moveDirection -= cameraRight;   // 左移動
-        if (Input.GetKey(KeyCode.D)) moveDirection += cameraRight;   // 右移動
+        if (Input.GetKey(KeyCode.W)) moveDirection += cameraForward; 
+        if (Input.GetKey(KeyCode.S)) moveDirection -= cameraForward; 
+        if (Input.GetKey(KeyCode.A)) moveDirection -= cameraRight;   
+        if (Input.GetKey(KeyCode.D)) moveDirection += cameraRight;   
 
         // 移動処理
         if (moveDirection != Vector3.zero)
@@ -36,6 +37,12 @@ public class PlayerController : MonoBehaviour
             // プレイヤーの向きを移動方向に合わせる
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+            animator.SetInteger("mode", 1);
+        }
+        else
+        {
+            animator.SetInteger("mode", 0);
         }
     }
 }
