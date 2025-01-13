@@ -9,8 +9,8 @@ public class CircleSearcher : TargetDetector
         {
             if (IsValidTarget(collider))
             {
-                currentTarget.Value = collider.gameObject;
-                break;
+                FoundSetting(collider.gameObject);
+                return;
             }
         }
     }

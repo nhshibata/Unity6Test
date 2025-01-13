@@ -11,16 +11,23 @@ public abstract class TargetDetector : MonoBehaviour
     protected ReactiveProperty<GameObject> currentTarget = new ReactiveProperty<GameObject>(null);
     public ReactiveProperty<GameObject> CurrentTarget { get => currentTarget; set => currentTarget = value; }
 
+    protected ReactiveProperty<bool> isFound = new ReactiveProperty<bool>(false);
+    protected ReactiveProperty<bool> IsFound { get => isFound; set => isFound = value; }
+
 
     protected virtual void Update()
     {
         if (Time.timeScale >= 1.0f)
         {
+            isFound.Value = false;
             Search();
         }
     }
 
-    protected abstract void Search(); // 派生クラスで探索ロジックを実装
+    /// <summary>
+    /// 派生クラスで探索ロジックを実装
+    /// </summary>
+    protected abstract void Search(); 
 
     protected bool IsValidTarget(Collider collider)
     {
@@ -29,9 +36,18 @@ public abstract class TargetDetector : MonoBehaviour
 
     protected void OnDrawGizmos()
     {
-        Gizmos.color = currentTarget.Value ? Color.red : Color.green;
+        Gizmos.color = isFound.Value ? Color.red : Color.green;
         DrawGizmo();
     }
 
-    protected abstract void DrawGizmo(); // 派生クラスでGizmoの描画を実装
+    /// <summary>
+    /// 派生クラスでGizmoの描画を実装
+    /// </summary>
+    protected abstract void DrawGizmo(); 
+
+    protected virtual void FoundSetting(GameObject obj)
+    {
+        isFound.Value = true;
+        currentTarget.Value = obj;
+    }
 }

@@ -14,8 +14,8 @@ public class LineSearcher : TargetDetector
         {
             if (IsValidTarget(hit.collider))
             {
-                currentTarget.Value = hit.collider.gameObject;
-                break;
+                FoundSetting(hit.collider.gameObject);
+                return;
             }
         }
     }

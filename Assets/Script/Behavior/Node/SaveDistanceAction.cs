@@ -1,8 +1,8 @@
 using System;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "SaveDistance", story: "Check distance between [Self] and [Target] and save it to [Distance]", category: "Action", id: "8ad517ee4d7b38f1c177c5d2e661ed10")]

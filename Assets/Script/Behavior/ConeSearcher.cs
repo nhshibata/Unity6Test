@@ -12,8 +12,8 @@ public class ConeSearcher : TargetDetector
         {
             if (IsValidTarget(collider) && IsWithinCone(collider.transform.position))
             {
-                currentTarget.Value = collider.gameObject;
-                break;
+                FoundSetting(collider.gameObject);
+                return;
             }
         }
     }
