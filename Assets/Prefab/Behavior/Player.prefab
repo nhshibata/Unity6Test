@@ -291,7 +291,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1df11dcc6c1385469d1ade32b0cd7dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 516707661187693617}
   moveSpeed: 6
+  rb: {fileID: 6297107366372779835}
   rotationSpeed: 10
 --- !u!1001 &9214902280908768574
 PrefabInstance:
@@ -301,9 +303,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6308402596470742866}
     m_Modifications:
+    - target: {fileID: 8703872773192268047, guid: 64c9d96775079344fac674889078804c, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: b8be66abf6761b34c9fd0bf2c56af20d, type: 2}
     - target: {fileID: 8703872773199547215, guid: 64c9d96775079344fac674889078804c, type: 3}
       propertyPath: m_Name
       value: Unity_Chan_generic
+      objectReference: {fileID: 0}
+    - target: {fileID: 8703872773199547215, guid: 64c9d96775079344fac674889078804c, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 8703872773199976303, guid: 64c9d96775079344fac674889078804c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -388,5 +398,10 @@ Rigidbody:
 --- !u!4 &516707661178622545 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8703872773199976303, guid: 64c9d96775079344fac674889078804c, type: 3}
+  m_PrefabInstance: {fileID: 9214902280908768574}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &516707661187693617 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8703872773192268047, guid: 64c9d96775079344fac674889078804c, type: 3}
   m_PrefabInstance: {fileID: 9214902280908768574}
   m_PrefabAsset: {fileID: 0}

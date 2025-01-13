@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float moveSpeed = 5.0f; // 移動速度
     [SerializeField]
+    private Rigidbody rb;
+    [SerializeField]
     private float rotationSpeed = 10.0f; // 回転速度
 
     void Update()
@@ -23,10 +25,14 @@ public class PlayerController : MonoBehaviour
 
         // 入力による移動方向の計算
         Vector3 moveDirection = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) moveDirection += cameraForward; 
-        if (Input.GetKey(KeyCode.S)) moveDirection -= cameraForward; 
-        if (Input.GetKey(KeyCode.A)) moveDirection -= cameraRight;   
-        if (Input.GetKey(KeyCode.D)) moveDirection += cameraRight;   
+        if (Input.GetKey(KeyCode.W)) 
+            moveDirection += cameraForward; 
+        if (Input.GetKey(KeyCode.S)) 
+            moveDirection -= cameraForward; 
+        if (Input.GetKey(KeyCode.A)) 
+            moveDirection -= cameraRight;   
+        if (Input.GetKey(KeyCode.D)) 
+            moveDirection += cameraRight;   
 
         // 移動処理
         if (moveDirection != Vector3.zero)
@@ -42,6 +48,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             animator.SetInteger("mode", 0);
         }
     }
