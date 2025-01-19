@@ -186,6 +186,8 @@ public class SudokuView : MonoBehaviour
         // 徐々に消える
         if(isFade)
             messageText.DOFade(0.0f, messageFadeDuration);
+        else
+            messageText.DOKill();
     }
 
     public void SetTimerText(float time)

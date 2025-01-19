@@ -35,24 +35,25 @@ public class SudokuManager : MonoBehaviour
         view.Initialize((x, y, grid) =>
         {
             bool isCorrect = model.CheckNumber(x, y);
-
+            int select = model.SelectNumber.Value;
             if (!view.NumberToggle.isOn)
             {
                 if (isCorrect)
                 {
-                    grid.SetNumber(NumberGrid.PosToIndex(x, y), model.SelectNumber.Value);
-                    view.StartSuccessEffect(model.SelectNumber.Value);
+                    grid.SetNumber(NumberGrid.PosToIndex(x, y), select);
+                    model.SetNumber(x, y, select);
+                    view.StartSuccessEffect(select);
                     // 文言はviewに任せるべき？
-                    view.SetMessage($"{model.SelectNumber.Value} is the correct answer!", true);
+                    view.SetMessage($"{select} is the correct answer!", true);
                 }
                 else
                 {
-                    view.SetMessage($"{model.SelectNumber.Value} is incorrect...", true);
+                    view.SetMessage($"{select} is incorrect...", true);
                 }
             }
             else
             {
-                grid.SetCandidateNumber(NumberGrid.PosToIndex(x, y), model.SelectNumber.Value);
+                grid.SetCandidateNumber(NumberGrid.PosToIndex(x, y), select);
             }
         });
 

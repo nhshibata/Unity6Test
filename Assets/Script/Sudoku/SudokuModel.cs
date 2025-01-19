@@ -76,7 +76,7 @@ public class SudokuModel
     public void SetNumber(int x, int y, int number)
     {
         var grid = hideGrid.Value;
-        grid[x, y] = number;
+        grid[y, x] = number;
         hideGrid.Value = grid;
 
         if (IsComplete())
@@ -95,7 +95,7 @@ public class SudokuModel
             if (item == 0)
                 return false;
         }
-        isGame.Value = true;
+        isGame.Value = false;
         return true;
     }
 }
