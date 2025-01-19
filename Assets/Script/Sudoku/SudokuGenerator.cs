@@ -25,8 +25,10 @@ public class SudokuGenerator
                 // 初期盤面を生成
                 FillGrid();
 
+#if UNITY_EDITOR
                 // 正常に生成できた場合
                 ExportGridToCsv(grid, "Assets/sudoku_grid.csv");
+#endif
                 return grid;
             }
             catch (Exception ex)
