@@ -1,9 +1,10 @@
 ﻿using DG.Tweening;
-using System;
 using UnityEngine;
 
 public class SizePulseAnimator : RectTransformAnimator
 {
+    [SerializeField]
+    private float delay = 0.1f;
     [SerializeField]
     private float sizeMultiplier = 0.8f; // 縮小倍率
     [SerializeField]
@@ -19,10 +20,7 @@ public class SizePulseAnimator : RectTransformAnimator
     /// </summary>
     public override void Initialize()
     {
-        if (targetRectTransform != null)
-        {
-            initialSize = targetRectTransform.sizeDelta;
-        }
+        initialSize = targetRectTransform.sizeDelta;
     }
 
     /// <summary>
@@ -30,9 +28,7 @@ public class SizePulseAnimator : RectTransformAnimator
     /// </summary>
     public override void StartAnimation()
     {
-        if (targetRectTransform == null) return;
-
-        StopAnimation(); // 既存のアニメーションを停止
+        StopAnimation();
 
         // アニメーションターゲットのサイズ設定
         Vector2 targetSize = initialSize;
@@ -45,10 +41,16 @@ public class SizePulseAnimator : RectTransformAnimator
             targetSize.y *= sizeMultiplier;
         }
 
-        // サイズを一瞬縮小して戻すループアニメーション
-        animationTween = targetRectTransform.DOSizeDelta(targetSize, animationDuration / 2)
+        // サイズを一瞬縮小して戻すアニメーション
+        animationTween = targetRectTransform.DOSizeDelta(targetSize, animationDuration)
             .SetEase(Ease.OutQuad)
-            .SetLoops(-1, LoopType.Yoyo); // Yoyoモーションで戻す
+            .OnComplete(() =>
+            {
+                // サイズ変更が完了したら元のサイズに戻す
+                targetRectTransform.DOSizeDelta(initialSize, animationDuration / 2)
+                    .SetDelay(delay)
+                    .SetEase(Ease.InSine);
+            });
     }
 
     /// <summary>
@@ -59,9 +61,20 @@ public class SizePulseAnimator : RectTransformAnimator
         base.StopAnimation();
 
         // 初期サイズに戻す
-        if (targetRectTransform != null)
-        {
-            targetRectTransform.DOSizeDelta(initialSize, 0.2f).SetEase(Ease.OutQuad);
-        }
+        Vector2 size = ((initialSize) == Vector2.zero ? targetRectTransform.sizeDelta : initialSize);
+        targetRectTransform.DOSizeDelta(size, animationDuration).SetEase(Ease.OutQuad);
     }
+
+
+    [SerializeField]
+    private bool isTest = false;
+    private void Update()
+    {
+        if (!isTest)
+            return;
+
+        isTest = false;
+        StartAnimation();
+    }
+
 }

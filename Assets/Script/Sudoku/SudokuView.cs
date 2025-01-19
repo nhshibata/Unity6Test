@@ -8,6 +8,10 @@ using UnityEngine.UI;
 public class SudokuView : MonoBehaviour
 {
     [SerializeField]
+    private Image blackPanel = null;
+    [SerializeField]
+    private TMP_Text timer = null;
+    [SerializeField]
     private TMP_Text messageText = null;
     [SerializeField]
     private Toggle numberToggle = null;
@@ -17,11 +21,9 @@ public class SudokuView : MonoBehaviour
     private Button generateButton = null;
     public Button GenerateButton { get => generateButton; set => generateButton = value; }
 
-    [SerializeField, Tooltip("1~9の順番とする")]
-    private List<Button> numberButton = new List<Button>();
-
     [SerializeField]
-    private List<NumberGrid> gridNumbers = new List<NumberGrid>();
+    private Dropdown dropdown = null;
+    public Dropdown Dropdown { get => dropdown; set => dropdown = value; }
 
     [SerializeField]
     private Sprite defaultNumberSprite = null;
@@ -29,7 +31,18 @@ public class SudokuView : MonoBehaviour
     private Sprite selectNumberSprite = null;
 
     [SerializeField]
+    private List<CharacterSpriteManager> characterSpriteManager = new List<CharacterSpriteManager>();
+
+    [SerializeField, Tooltip("1~9の順番とする")]
+    private List<Button> numberButton = new List<Button>();
+
+    [SerializeField, Tooltip("左上から右下の順に格納")]
+    private List<NumberGrid> gridNumbers = new List<NumberGrid>();
+
+    [SerializeField]
     private float messageFadeDuration = 2.0f;
+
+    private int characterIndex = 0;
 
 
     private void Awake()
@@ -38,6 +51,8 @@ public class SudokuView : MonoBehaviour
         {
             grid.AllCellClear();
         }
+
+        characterSpriteManager.ForEach(obj=>obj.gameObject.SetActive(false));
     }
 
     /// <summary>
@@ -66,6 +81,12 @@ public class SudokuView : MonoBehaviour
         {
             grid.ReStart();
         }
+
+        ChangeCharacter();
+
+        // 入力防止
+        blackPanel.raycastTarget = true;
+        DOVirtual.DelayedCall(1.0f, () => { blackPanel.raycastTarget = false; },false);
     }
 
     public void SetNumberAction(Action<int> action)
@@ -120,6 +141,7 @@ public class SudokuView : MonoBehaviour
         foreach (var item in numberButton)
         {
             item.image.sprite = defaultNumberSprite;
+            item.image.color = Color.white;
         }
     }
 
@@ -136,6 +158,7 @@ public class SudokuView : MonoBehaviour
 
         int index = number - 1;
         numberButton[index].image.sprite = selectNumberSprite;
+        numberButton[index].image.color = Color.black;
     }
 
     /// <summary>
@@ -158,4 +181,52 @@ public class SudokuView : MonoBehaviour
         // 徐々に消える
         messageText.DOFade(0.0f, messageFadeDuration);
     }
+
+    public void SetTimerText(float time)
+    {
+        // 秒数を分と秒に変換
+        int minutes = Mathf.FloorToInt(time / 60f);
+        int seconds = Mathf.FloorToInt(time % 60f);
+
+        // mm:ss 形式でテキストに反映
+        timer.text = $"{minutes:00}:{seconds:00}";
+    }
+
+    public void ChangeCharacter()
+    {
+        int index = characterIndex;
+
+        characterSpriteManager.ForEach(character => character.RectAnim.StopAnimation());
+
+        if (characterSpriteManager.Count > 0)
+        {
+            do
+            {
+                index = UnityEngine.Random.Range(0, characterSpriteManager.Count);
+            } while (index == characterIndex);
+        }
+
+        characterSpriteManager[characterIndex].StartBlackFade(
+            null,
+            () =>
+            {
+                characterSpriteManager[characterIndex].gameObject.SetActive(false);
+                characterSpriteManager[index].gameObject.SetActive(true);
+                characterSpriteManager[index].StartWhiteFade(
+                    (image) =>
+                    {
+                        image.color = Color.black;
+                    },
+                    () =>
+                    {
+                        characterIndex = index;
+                    });
+            });
+    }
+
+    public void StartSuccessEffect()
+    {
+        characterSpriteManager[characterIndex].RectAnim.StartAnimation();
+    }
+
 }

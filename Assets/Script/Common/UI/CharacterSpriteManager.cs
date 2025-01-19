@@ -36,16 +36,6 @@ public class CharacterSpriteManager : MonoBehaviour
         ChangeSprite(charSprites[DEFAULT_FACE]);
     }
 
-    public void StartShaking()
-    {
-        rectAnim.StartAnimation();
-    }
-
-    public void StopShaking()
-    {
-        rectAnim.StopAnimation();
-    }
-
     /// <summary>
     /// 画像のスプライトを変更
     /// </summary>
