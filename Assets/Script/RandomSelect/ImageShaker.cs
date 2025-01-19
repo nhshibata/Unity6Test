@@ -1,107 +1,76 @@
 ﻿using DG.Tweening;
-using System;
 using UnityEngine;
-using UnityEngine.UI;
 
-public partial class RandomSelecterView
+public class ImageShaker : RectTransformAnimator
 {
-    [Serializable]
-    public class ImageShaker
+    [SerializeField]
+    private float shakeStrength = 20.0f;
+    [SerializeField]
+    private bool snapping = false;
+    [SerializeField]
+    private bool isHorizontal = false;
+
+    private Vector2 initialPosition;
+
+
+    public override void Initialize()
     {
-        [SerializeField] 
-        private Image targetImage;
-        [SerializeField] 
-        private float shakeDuration = 1f;
-        [SerializeField] 
-        private float shakeStrength = 10f;
-        [SerializeField] 
-        private bool snapping = false;
-        [SerializeField] 
-        private bool isHorizontal = false;
+        initialPosition = targetRectTransform.anchoredPosition;
+    }
 
-        private Vector2 initialPosition;
-        private Tween shakeTween;
-
-        public void Initialize()
+    public override void StartAnimation()
+    {
+        if (isHorizontal)
         {
-            initialPosition = targetImage.rectTransform.anchoredPosition;
+            ShakeHorizontal();
         }
-
-        public void StartShake()
+        else
         {
-            if (isHorizontal)
-            {
-                ShakeHorizontal();
-            }
-            else
-            {
-                ShakeVertical();
-            }
+            ShakeVertical();
         }
+    }
 
-        /// <summary>
-        /// 画像を横方向に振動させる
-        /// </summary>
-        public void ShakeHorizontal()
-        {
-            initialPosition = targetImage.rectTransform.anchoredPosition; // 初期位置を保存
-            StopShake(); // 既存の振動を停止
+    /// <summary>
+    /// 振動を停止する
+    /// </summary>
+    public override void StopAnimation()
+    {
+        base.StopAnimation();
 
-            shakeTween = targetImage.rectTransform.DOAnchorPosX(
-                initialPosition.x + shakeStrength,
-                shakeDuration,
-                snapping)
-                .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Yoyo); // 無限ループでYoyoモーション
-        }
+        // 初期位置に戻す
+        targetRectTransform.DOAnchorPos(initialPosition, 0.5f).SetEase(Ease.OutQuad); // 緩やかに戻す
+    }
 
-        /// <summary>
-        /// 画像を縦方向に振動させる
-        /// </summary>
-        public void ShakeVertical()
-        {
-            initialPosition = targetImage.rectTransform.anchoredPosition; // 初期位置を保存
-            StopShake(); // 既存の振動を停止
+    /// <summary>
+    /// 画像を横方向に振動させる
+    /// </summary>
+    public void ShakeHorizontal()
+    {
+        initialPosition = targetRectTransform.anchoredPosition; // 初期位置を保存
+        StopAnimation(); 
 
-            shakeTween = targetImage.rectTransform.DOAnchorPosY(
-                initialPosition.y + shakeStrength,
-                shakeDuration,
-                snapping)
-                .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Yoyo); // 無限ループでYoyoモーション
-        }
+        animationTween = targetRectTransform.DOAnchorPosX(
+            initialPosition.x + shakeStrength,
+            animationDuration,
+            snapping)
+            .SetEase(Ease.Linear)
+            .SetLoops(-1, LoopType.Yoyo); // 無限ループでYoyoモーション
+    }
 
-        /// <summary>
-        /// 振動を停止する
-        /// </summary>
-        public void StopShake()
-        {
-            if (shakeTween != null && shakeTween.IsActive())
-            {
-                shakeTween.Kill();
-                shakeTween = null;
-            }
+    /// <summary>
+    /// 画像を縦方向に振動させる
+    /// </summary>
+    public void ShakeVertical()
+    {
+        initialPosition = targetRectTransform.anchoredPosition; // 初期位置を保存
+        StopAnimation();
 
-            // 初期位置に戻す
-            targetImage.rectTransform.DOAnchorPos(initialPosition, 0.5f).SetEase(Ease.OutQuad); // 緩やかに戻す
-        }
-
-        /// <summary>
-        /// 画像のスプライトを変更
-        /// </summary>
-        public void ChangeSprite(Sprite sprite)
-        {
-            targetImage.sprite = sprite;
-        }
-
-        /// <summary>
-        /// 振動中かどうかを判定
-        /// </summary>
-        public bool IsShaking()
-        {
-            return shakeTween != null;
-        }
-
+        animationTween = targetRectTransform.DOAnchorPosY(
+            initialPosition.y + shakeStrength,
+            animationDuration,
+            snapping)
+            .SetEase(Ease.Linear)
+            .SetLoops(-1, LoopType.Yoyo); // 無限ループでYoyoモーション
     }
 
 }
