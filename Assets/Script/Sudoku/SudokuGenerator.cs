@@ -112,19 +112,6 @@ public class SudokuGenerator
         }
     }
 
-    private bool IsSafeInBox(int boxStartRow, int boxStartCol, int num)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                if (grid[boxStartRow + i, boxStartCol + j] == num)
-                    return false;
-            }
-        }
-        return true;
-    }
-
     private bool FillRemaining(int i, int j)
     {
         int attemptCount = 0;
@@ -151,15 +138,19 @@ public class SudokuGenerator
                 return true;
         }
 
+        // 数字をランダムに試してみる
         for (int num = 1; num <= 9; num++)
         {
+            // 行・列・ボックスに数字が安全かどうかをチェック
             if (IsSafe(i, j, num))
             {
                 grid[i, j] = num;
 
+                // 次のセルへ進む
                 if (FillRemaining(i, j + 1))
                     return true;
 
+                // うまくいかなければ元に戻す
                 grid[i, j] = 0;
             }
 
@@ -190,6 +181,19 @@ public class SudokuGenerator
         for (int i = 0; i < 9; i++)
             if (grid[i, j] == num)
                 return false;
+        return true;
+    }
+
+    private bool IsSafeInBox(int boxStartRow, int boxStartCol, int num)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                if (grid[boxStartRow + i, boxStartCol + j] == num)
+                    return false;
+            }
+        }
         return true;
     }
 
