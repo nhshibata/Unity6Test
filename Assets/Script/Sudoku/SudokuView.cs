@@ -52,6 +52,7 @@ public class SudokuView : MonoBehaviour
             grid.AllCellClear();
         }
 
+        SetMessage("generate!", false);
         characterSpriteManager.ForEach(obj=>obj.gameObject.SetActive(false));
     }
 
@@ -81,12 +82,36 @@ public class SudokuView : MonoBehaviour
         {
             grid.ReStart();
         }
+        foreach (var button in numberButton)
+        {
+            button.image.raycastTarget = true;
+        }
 
         ChangeCharacter();
 
         // 入力防止
         blackPanel.raycastTarget = true;
         DOVirtual.DelayedCall(1.0f, () => { blackPanel.raycastTarget = false; },false);
+    }
+
+    /// <summary>
+    /// 全てのセルをデフォルトに戻す
+    /// </summary>
+    public void ResetGridColors()
+    {
+        foreach (var grid in gridNumbers)
+        {
+            grid.ResetColors();
+        }
+    }
+
+    public void ResetNumberButtons()
+    {
+        foreach (var item in numberButton)
+        {
+            item.image.sprite = defaultNumberSprite;
+            item.image.color = Color.white;
+        }
     }
 
     public void SetNumberAction(Action<int> action)
@@ -126,26 +151,6 @@ public class SudokuView : MonoBehaviour
     }
 
     /// <summary>
-    /// 全てのセルをデフォルトに戻す
-    /// </summary>
-    public void ResetGridColors()
-    {
-        foreach (var grid in gridNumbers)
-        {
-            grid.ResetColors();
-        }
-    }
-
-    public void ResetNumberButtons()
-    {
-        foreach (var item in numberButton)
-        {
-            item.image.sprite = defaultNumberSprite;
-            item.image.color = Color.white;
-        }
-    }
-
-    /// <summary>
     /// 数独の特定の数字をハイライト
     /// </summary>
     /// <param name="number">ハイライトする数字</param>
@@ -153,7 +158,7 @@ public class SudokuView : MonoBehaviour
     {
         foreach (var grid in gridNumbers)
         {
-            grid.HighlightNumber(number);
+            grid.HighlightNumber(number, NumberGrid.ColorIndex.Highlight);
         }
 
         int index = number - 1;
@@ -174,12 +179,13 @@ public class SudokuView : MonoBehaviour
         return (row % 3) * 3 + (col % 3); // GridNumber 内のセルインデックスを計算
     }
 
-    public void SetMessage(string message)
+    public void SetMessage(string message, bool isFade)
     {
         messageText.DOFade(1.0f, 0);
         messageText.text = message.Trim();
         // 徐々に消える
-        messageText.DOFade(0.0f, messageFadeDuration);
+        if(isFade)
+            messageText.DOFade(0.0f, messageFadeDuration);
     }
 
     public void SetTimerText(float time)
@@ -224,9 +230,28 @@ public class SudokuView : MonoBehaviour
             });
     }
 
-    public void StartSuccessEffect()
+    public void StartSuccessEffect(int number)
     {
         characterSpriteManager[characterIndex].RectAnim.StartAnimation();
+
+        int matchCount = 0;
+        foreach (var grid in gridNumbers)
+        {
+            if (grid.MatchNumber(number, null))
+                ++matchCount;
+        }
+
+        if (matchCount != gridNumbers.Count)
+            return;
+
+        // 一つの数字が完了していたら
+        int index = number - 1;
+        numberButton[index].image.raycastTarget = false;
+        foreach (var grid in gridNumbers)
+        {
+            grid.HighlightNumber(number, NumberGrid.ColorIndex.ClearHighlight);
+        }
+
     }
 
 }

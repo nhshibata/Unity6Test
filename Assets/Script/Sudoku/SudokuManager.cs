@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using R3;
-using Unity.VisualScripting;
 using UnityEngine;
 using static SudokuConfig;
 
@@ -42,14 +41,13 @@ public class SudokuManager : MonoBehaviour
                 if (isCorrect)
                 {
                     grid.SetNumber(NumberGrid.PosToIndex(x, y), model.SelectNumber.Value);
-                    view.StartSuccessEffect();
+                    view.StartSuccessEffect(model.SelectNumber.Value);
                     // 文言はviewに任せるべき？
-                    view.SetMessage($"{model.SelectNumber.Value} is the correct answer!");
+                    view.SetMessage($"{model.SelectNumber.Value} is the correct answer!", true);
                 }
                 else
                 {
-                    view.ResetGridColors();
-                    view.SetMessage($"{model.SelectNumber.Value} is incorrect...");
+                    view.SetMessage($"{model.SelectNumber.Value} is incorrect...", true);
                 }
             }
             else
@@ -66,7 +64,7 @@ public class SudokuManager : MonoBehaviour
         model.OnComplete
             .Subscribe(_ =>
             {
-                view.SetMessage("Complete!");
+                view.SetMessage("Complete!", false);
             })
             .AddTo(this);
 

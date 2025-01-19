@@ -1,27 +1,36 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class NumberGrid : MonoBehaviour
 {
+    public enum ColorIndex
+    {
+        Default,
+        Highlight,
+        ClearHighlight,
+    }
+
     private static readonly int CELL_SIZE = 3;
-
-    [SerializeField]
-    private Color defaultColor = Color.black;
-
-    [SerializeField]
-    private Color highlightColor = Color.blue;
+    private static Color defaultColor = Color.black;
+    private static Color highlightColor = Color.blue;
+    private static Color clearHighlightColor = Color.green;
 
     [SerializeField]
     private List<SudokuButton> cells = new List<SudokuButton>();
 
-    // (x, y) を通知するコールバック
+    /// <summary>
+    /// (x, y) を通知するコールバック
+    /// </summary>
     public Action<int, int, NumberGrid> OnCellClicked;
 
-    // この GridNumber の X 座標
+    /// <summary>
+    /// この GridNumber の X 座標
+    /// </summary>
     private int gridX;
-    // この GridNumber の Y 座標
+    /// <summary>
+    /// この GridNumber の Y 座標
+    /// </summary>
     private int gridY;
 
 
@@ -56,7 +65,6 @@ public class NumberGrid : MonoBehaviour
             cell.SetCandidateEnable(true);
             cell.Text.text = " ";
             cell.Text.color = defaultColor;
-            cell.Text.color = defaultColor;
         }
     }
 
@@ -82,6 +90,7 @@ public class NumberGrid : MonoBehaviour
             cell.SetCandidateEnable(false);
             cell.Button.image.raycastTarget = false;
         }
+
     }
 
     public void SetCandidateNumber(int index, int number)
@@ -90,29 +99,48 @@ public class NumberGrid : MonoBehaviour
         cell.SetCandidateNumber(number);
     }
 
-    /// <summary>
-    /// 指定した数字に対応するセルをハイライト
-    /// </summary>
-    /// <param name="number">ハイライトする数字</param>
-    public void HighlightNumber(int number)
+    public bool MatchNumber(int number, Action<TMPro.TMP_Text> onMatchFound)
     {
         foreach (var item in cells)
         {
             if (int.TryParse(item.Text.text, out int cellNumber) && cellNumber == number)
             {
-                item.Text.color = highlightColor;
+                onMatchFound?.Invoke(item.Text);
+                return true;
             }
         }
+        return false;
     }
 
     /// <summary>
-    /// 全てのセルの色をデフォルトに戻す
+    /// 指定した数字に対応するセルをハイライト
     /// </summary>
+    public void HighlightNumber(int number, ColorIndex colorIndex)
+    {
+        MatchNumber(number, (text) =>
+        {
+            if (int.TryParse(text.text, out int cellNumber) && cellNumber == number)
+            {
+                text.color = GetColor(colorIndex);
+            }
+        });
+    }
+
+    private static Color GetColor(ColorIndex colorIndex) => colorIndex switch
+    {
+        ColorIndex.Default => defaultColor,
+        ColorIndex.Highlight => highlightColor,
+        ColorIndex.ClearHighlight => clearHighlightColor,
+        _ => throw new NotImplementedException(),
+    };
+
     public void ResetColors()
     {
         foreach (var item in cells)
         {
-            item.Text.color = defaultColor;
+            if (item.Text.color == GetColor(ColorIndex.ClearHighlight))
+                continue;
+            item.Text.color = GetColor(ColorIndex.Default);
         }
     }
 
@@ -124,7 +152,7 @@ public class NumberGrid : MonoBehaviour
         foreach (var item in cells)
         {
             item.Text.text = " ";
-            item.Text.color = defaultColor;
+            item.Text.color = GetColor(ColorIndex.Default);
         }
     }
 
