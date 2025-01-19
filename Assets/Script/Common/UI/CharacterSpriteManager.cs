@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using DG.Tweening;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +15,9 @@ public class CharacterSpriteManager : MonoBehaviour
     public RectTransformAnimator RectAnim { get => rectAnim; }
     [SerializeField]
     private List<Sprite> charSprites;
+
+    [SerializeField]
+    private float fadeDuration = 0.5f;
 
 
     public void Awake()
@@ -48,4 +53,17 @@ public class CharacterSpriteManager : MonoBehaviour
     {
         image.sprite = sprite;
     }
+
+    public void StartBlackFade(Action<Image> onStart, Action onComplete)
+    {
+        onStart?.Invoke(image);
+        image.DOColor(Color.black, fadeDuration).OnComplete(()=>onComplete?.Invoke());
+    }
+    
+    public void StartWhiteFade(Action<Image> onStart, Action onComplete)
+    {
+        onStart?.Invoke(image);
+        image.DOColor(Color.white, fadeDuration).OnComplete(()=>onComplete?.Invoke());
+    }
+
 }
