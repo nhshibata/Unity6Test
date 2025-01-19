@@ -28,6 +28,9 @@ public class SudokuModel
     private ReactiveProperty<bool> isGame = new ReactiveProperty<bool>(false);
     public ReactiveProperty<bool> IsGame { get => isGame; set => isGame = value; }
 
+    // TODO:ミス回数を記録
+    // TODO:スコアを記録
+
     private int seed;
 
 

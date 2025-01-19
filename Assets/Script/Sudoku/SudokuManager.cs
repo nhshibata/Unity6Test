@@ -86,6 +86,10 @@ public class SudokuManager : MonoBehaviour
     private void Update()
     {
         model.TimerUpdate();
+
+        // TODO: 自動で数字を埋めていくテストを追加
+        // TODO: リザルトとなるウィンドウをポップアップ
+        // TODO: 余裕があれば操作を設置
     }
 
     /// <summary>
