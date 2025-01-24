@@ -204,6 +204,7 @@ public class SudokuView : MonoBehaviour
     {
         int index = characterIndex;
 
+        characterSpriteManager[characterIndex].ResetToDefaultCharacter();
         characterSpriteManager.ForEach(character => character.RectAnim.StopAnimation());
 
         if (characterSpriteManager.Count > 0)
@@ -234,6 +235,7 @@ public class SudokuView : MonoBehaviour
 
     public void StartSuccessEffect(int number)
     {
+        characterSpriteManager[characterIndex].ChangeToRandomCharacter();
         characterSpriteManager[characterIndex].RectAnim.StartAnimation();
 
         int matchCount = 0;
