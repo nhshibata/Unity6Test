@@ -25,7 +25,7 @@ public partial class RandomSelecterView : MonoBehaviour
     [SerializeField]
     private TMP_Text guideText = null;
     [SerializeField]
-    private ImageShaker shaker = null;
+    private CharacterSpriteManager characterSpriteManager = null;
     [Header("Rotate")]
     [SerializeField] 
     private RectTransform target = null;
@@ -34,8 +34,6 @@ public partial class RandomSelecterView : MonoBehaviour
     [SerializeField]
     private SelectionDisplayManager selectionDisplayManager = null;
     [Header("Character Sprite")]
-    [SerializeField]
-    private List<Sprite> charSprites = new List<Sprite>();
 
     public Action<bool> OnClickStart {  get; set; }
 
@@ -47,14 +45,13 @@ public partial class RandomSelecterView : MonoBehaviour
         startButton.Button.onClick.AddListener(ToggleStartAnimation);
         resetButton.onClick.AddListener(selectionDisplayManager.Reset);
         resetButton.onClick.AddListener(() => { numberText.SetText("-"); });
-        shaker.Initialize();
     }
 
     private void OnDisable()
     {
         if (Application.isPlaying)
         {
-            shaker.StopShake();
+            characterSpriteManager.RectAnim.StopAnimation();
             if (rotateTween != null && rotateTween.IsActive())
             {
                 rotateTween.Kill();
@@ -96,7 +93,7 @@ public partial class RandomSelecterView : MonoBehaviour
 
     private void ToggleStartAnimation()
     {
-        if (shaker.IsShaking())
+        if (characterSpriteManager.RectAnim.IsAnimating())
         {
             StopRandomAnimation();
         }
@@ -108,9 +105,8 @@ public partial class RandomSelecterView : MonoBehaviour
 
     private void StartRandomAnimation()
     {
-        int index = UnityEngine.Random.Range(DEFAULT_FACE + 1, charSprites.Count);
-        shaker.ChangeSprite(charSprites[index]);
-        shaker.StartShake();
+        characterSpriteManager.ResetToDefaultCharacter();
+        characterSpriteManager.RectAnim.StartAnimation();
         OnClickStart?.Invoke(true);
 
         rotateTween = target.DORotate(new Vector3(0, 0, 360), rotationDuration, RotateMode.FastBeyond360)
@@ -122,8 +118,8 @@ public partial class RandomSelecterView : MonoBehaviour
 
     private void StopRandomAnimation()
     {
-        shaker.ChangeSprite(charSprites[DEFAULT_FACE]);
-        shaker.StopShake();
+        characterSpriteManager.ResetToDefaultCharacter();
+        characterSpriteManager.RectAnim.StopAnimation();
         OnClickStart?.Invoke(false);
         rotateTween?.Kill();
         rotateTween = null;

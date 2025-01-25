@@ -2981,6 +2981,8 @@ GameObject:
   - component: {fileID: 1074914506}
   - component: {fileID: 1074914508}
   - component: {fileID: 1074914507}
+  - component: {fileID: 1074914509}
+  - component: {fileID: 1074914510}
   m_Layer: 5
   m_Name: 'Image[Character]'
   m_TagString: Untagged
@@ -3045,6 +3047,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1074914505}
   m_CullTransparentMesh: 1
+--- !u!114 &1074914509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074914505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04d1473a1361ae7439655752c0426e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1074914507}
+  rectAnim: {fileID: 1074914510}
+  charSprites:
+  - {fileID: 21300000, guid: abcbbd1037cd4764db6ac7397a29c0e5, type: 3}
+  - {fileID: 21300000, guid: 3eca68080fbbdf24093018343922f6da, type: 3}
+  - {fileID: 21300000, guid: a14b56c930aa0fd43b352eac852c4f30, type: 3}
+  - {fileID: 21300000, guid: 413787021633c4b4685c2e9c8a2b8ed9, type: 3}
+  - {fileID: 21300000, guid: 4841223e22d33f948a1cc7d908cecd82, type: 3}
+  - {fileID: 21300000, guid: ddafc6f83bd46734ba475f9e0c1b2cc4, type: 3}
+  - {fileID: 21300000, guid: 80fa5c1b0046d93448a23761958b0b02, type: 3}
+  - {fileID: 21300000, guid: 598004eba8623204086a6c915a52c9c2, type: 3}
+  - {fileID: 21300000, guid: e10f19954983f2342b653d0b6b585102, type: 3}
+  - {fileID: 21300000, guid: 47531d56232ba5a40a9c156593547911, type: 3}
+  - {fileID: 21300000, guid: 74fef5eadbacedf4c9a071531a07bcad, type: 3}
+  - {fileID: 21300000, guid: 0cc1a7059d9bede42a413e65fcb55ab9, type: 3}
+  - {fileID: 21300000, guid: f48c3516c13cc87438520509f3185f08, type: 3}
+  - {fileID: 21300000, guid: 59b946c8c16163a4399c896ed3bc4f61, type: 3}
+  - {fileID: 21300000, guid: d4c990895f93b92469f7ed3fdb26451b, type: 3}
+  - {fileID: 21300000, guid: 2c55e5aff49be3840a0b013ee5028e3d, type: 3}
+--- !u!114 &1074914510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074914505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f3a63b68fe32804c8a8d5b169b5a38a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRectTransform: {fileID: 1074914506}
+  animationDuration: 0.2
+  shakeStrength: 20
+  snapping: 0
+  isHorizontal: 0
 --- !u!1 &1077579191
 GameObject:
   m_ObjectHideFlags: 0
@@ -4699,32 +4749,10 @@ MonoBehaviour:
   resetButton: {fileID: 1077579194}
   numberText: {fileID: 1561181610}
   guideText: {fileID: 1277987153}
-  shaker:
-    targetImage: {fileID: 1074914507}
-    shakeDuration: 0.2
-    shakeStrength: 20
-    snapping: 0
-    isHorizontal: 0
+  characterSpriteManager: {fileID: 1074914509}
   target: {fileID: 604194536}
   rotationDuration: 50
   selectionDisplayManager: {fileID: 1768582946}
-  charSprites:
-  - {fileID: 21300000, guid: abcbbd1037cd4764db6ac7397a29c0e5, type: 3}
-  - {fileID: 21300000, guid: 3eca68080fbbdf24093018343922f6da, type: 3}
-  - {fileID: 21300000, guid: a14b56c930aa0fd43b352eac852c4f30, type: 3}
-  - {fileID: 21300000, guid: 413787021633c4b4685c2e9c8a2b8ed9, type: 3}
-  - {fileID: 21300000, guid: 4841223e22d33f948a1cc7d908cecd82, type: 3}
-  - {fileID: 21300000, guid: ddafc6f83bd46734ba475f9e0c1b2cc4, type: 3}
-  - {fileID: 21300000, guid: 80fa5c1b0046d93448a23761958b0b02, type: 3}
-  - {fileID: 21300000, guid: 598004eba8623204086a6c915a52c9c2, type: 3}
-  - {fileID: 21300000, guid: e10f19954983f2342b653d0b6b585102, type: 3}
-  - {fileID: 21300000, guid: 47531d56232ba5a40a9c156593547911, type: 3}
-  - {fileID: 21300000, guid: 74fef5eadbacedf4c9a071531a07bcad, type: 3}
-  - {fileID: 21300000, guid: 0cc1a7059d9bede42a413e65fcb55ab9, type: 3}
-  - {fileID: 21300000, guid: f48c3516c13cc87438520509f3185f08, type: 3}
-  - {fileID: 21300000, guid: 59b946c8c16163a4399c896ed3bc4f61, type: 3}
-  - {fileID: 21300000, guid: d4c990895f93b92469f7ed3fdb26451b, type: 3}
-  - {fileID: 21300000, guid: 2c55e5aff49be3840a0b013ee5028e3d, type: 3}
 --- !u!1001 &1627160570
 PrefabInstance:
   m_ObjectHideFlags: 0
