@@ -54,7 +54,7 @@ public class ADVCsvReader
         if (scenario == null)
             return null;
 
-        CharacterData character = FindData(characterDataList, c => c.Id == scenario.Argument1);
+        CharacterData character = FindData(characterDataList, c => c.SpriteName == scenario.Argument1);
         LayerData layer = FindData(layerDataList, l => l.Id == scenario.Argument2);
         TextureData texture = FindData(textureDataList, t => t.Id == scenario.Argument1);
         ScenarioLabelData labelData = FindData(scenarioLabelDataList, l => l.ScenarioId == scenario.Argument2);
