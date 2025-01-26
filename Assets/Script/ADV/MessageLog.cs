@@ -16,6 +16,8 @@ public class MessageLog : MonoBehaviour
 
     private void Awake()
     {
+        closeButton.onClick.AddListener(Hide);
+
         Hide();
     }
 

@@ -2,6 +2,7 @@
 using R3;
 using System;
 using UnityEngine;
+using Zenject;
 
 [Serializable]
 public class ConfigData
@@ -15,7 +16,7 @@ public class ConfigData
 public class ConfigController : MonoBehaviour
 {
     #region Model
-    public class ConfigModel
+    public class ConfigModel : IExample
     {
         private const string SaveKey = "ADV_Config";
         private ReactiveProperty<ConfigData> configData;
@@ -52,6 +53,7 @@ public class ConfigController : MonoBehaviour
             {
                 configData = new ReactiveProperty<ConfigData>(new ConfigData());
             }
+            Debug.Log("config date Load!");
         }
     }
     #endregion
@@ -59,11 +61,23 @@ public class ConfigController : MonoBehaviour
     [SerializeField]
     private ConfigView view = null;
 
+    [Inject]
+    private ServiceLocator serviceLocator;
+
     private ConfigModel model;
 
 
+    private void Awake()
+    {
+        
+    }
+
     private void Start()
     {
+        model = new ConfigModel();
+        serviceLocator.RegisterService(model);
+        model = serviceLocator.GetService<ConfigModel>();
+
         // モデルのデータをUIに反映
         model.ConfigData.Subscribe(config => {
             view.SetConfig(config);
