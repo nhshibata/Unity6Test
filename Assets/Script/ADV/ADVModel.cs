@@ -5,21 +5,14 @@ using System.Threading.Tasks;
 using UnityEngine;
 using static ADVCsvReader;
 
+[Serializable]
 public class ADVModel
 {
     [Serializable]
     public class PageData
     {
-        private int scenarioNo = 1;
-        public int ScenarioNo { get => scenarioNo; set => scenarioNo = value; }
-        private int scenarioOrder = 1;
-        public int ScenarioOrder { get => scenarioOrder; set => scenarioOrder = value; }
-
-        public PageData(int scenarioNo, int scenarioOrder)
-        {
-            this.scenarioNo = scenarioNo;
-            this.scenarioOrder = scenarioOrder;
-        }
+        public int ScenarioNo;
+        public int ScenarioOrder;
     }
 
     private static readonly string SaveKey = "ADV_Save";
@@ -32,23 +25,27 @@ public class ADVModel
 
     private ADVCsvReader csvReader = null;
 
-    private ReactiveProperty<PageData> currentPage = new ReactiveProperty<PageData>(new PageData(1, 1));
-    private ReactiveProperty<PageData> nextPage = new ReactiveProperty<PageData>(new PageData(1, 1));
+    private ReactiveProperty<PageData> currentPage = new ReactiveProperty<PageData>(new PageData());
+    private ReactiveProperty<PageData> nextPage = new ReactiveProperty<PageData>(new PageData());
 
     private CancellationTokenSource cancellationTokenSource;
 
     public Action<UIReflection> OnPageUpdated { get; set; }
 
+    // TODO:仮の物
+    public TextAsset layersCsv = null;
+    public TextAsset characterCsv = null;
+    public TextAsset textureCsv = null;
+    public TextAsset scenarioLabelCsv = null;
+    public TextAsset scenarioCsv = null;
+
 
     public void Init()
     {
-        // データを読み込む
-        TextAsset layersCsv = null;
-        TextAsset characterCsv = null;
-        TextAsset textureCsv = null;
-        TextAsset scenarioLabelCsv = null;
-        TextAsset scenarioCsv = null;
+        nextPage.Value.ScenarioNo = 1;
+        nextPage.Value.ScenarioOrder = 1;
 
+        // データを読み込む
         csvReader = new ADVCsvReader(layersCsv, characterCsv, textureCsv, scenarioLabelCsv, scenarioCsv);
         var reflec = csvReader.PrintScenarioDetails(nextPage.Value.ScenarioNo, nextPage.Value.ScenarioOrder);
         currentPage = nextPage;
@@ -112,9 +109,10 @@ public class ADVModel
 
     public void Save()
     {
-        string json = JsonUtility.ToJson(currentPage);
+        string json = JsonUtility.ToJson(currentPage.Value);
         PlayerPrefs.SetString(SaveKey, json);
         PlayerPrefs.Save();
+        Debug.Log($"currentPage {currentPage.Value.ScenarioNo}-{currentPage.Value.ScenarioOrder}");
     }
 
     public void Load()
@@ -122,16 +120,21 @@ public class ADVModel
         if (PlayerPrefs.HasKey(SaveKey))
         {
             string json = PlayerPrefs.GetString(SaveKey);
-            currentPage = new ReactiveProperty<PageData>(JsonUtility.FromJson<PageData>(json));
+            PageData loadedData = JsonUtility.FromJson<PageData>(json);
+            currentPage.Value = loadedData;  // 値を直接設定
+            Debug.Log($"currentPage {loadedData.ScenarioNo}-{loadedData.ScenarioOrder}");
         }
         else
         {
-            currentPage = new ReactiveProperty<PageData>(new PageData(1, 1));
+            // PlayerPrefsにデータがない場合は初期化
+            currentPage.Value = new PageData { ScenarioNo = 1, ScenarioOrder = 1 };
         }
+        Debug.Log($"currentPage {currentPage.Value.ScenarioNo}-{currentPage.Value.ScenarioOrder}");
 
         // 現在のページ情報を取得
         UpdatePage(currentPage.Value);
     }
+
 
 }
 

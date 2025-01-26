@@ -89,7 +89,8 @@ public class ADVView : MonoBehaviour
 
     private void Awake()
     {
-        spriteManager = FindFirstObjectByType<SpriteManager>();
+        spriteManager = FindAnyObjectByType<SpriteManager>();
+        Debug.Log("null?" + (spriteManager ? "on" : "off"));
 
         // ボタンにイベントを設定
         autoToggle.onValueChanged.AddListener(isOn => OnAutoToggleChanged?.Invoke(isOn));
@@ -218,6 +219,8 @@ public class ADVView : MonoBehaviour
 
     public void DataToUpdate(UIReflection reflection)
     {
+        Debug.Log(reflection + $"Command: {reflection.ScenarioData.Command}");
+
         // TODO: 挙動は他ファイルに分割する
         if(reflection.ScenarioData.Command == "Character")
         {
@@ -235,13 +238,12 @@ public class ADVView : MonoBehaviour
         }
         else if(reflection.ScenarioData.Command == "StartScenario")
         {
-            // fade処理
-            //_ = fadeManager.FadeOutAsync();
+            //_ = fadeManager.FadeInAsync();
         }
         else if(reflection.ScenarioData.Command == "EndScenario")
         {
-            // fade処理
-            _ = fadeManager.FadeOutAsync();
+            // TODO: シナリオが切り替わる処理
+            _ = fadeManager.FadeInAsync();
         }
         else if(reflection.ScenarioData.Command == string.Empty)
         {
@@ -295,12 +297,13 @@ public class ADVView : MonoBehaviour
 
     private void HideCharacter(int characterIndex)
     {
-        characters[characterIndex].gameObject.SetActive(false);
+        characters[characterIndex].color = Color.black;
     }
 
     private void UpdateCharacterPositionAndSize(int characterIndex, UIReflection reflection)
     {
-        characters[characterIndex].rectTransform.position = new Vector3(reflection.LayerData.X, reflection.LayerData.Y, 0);
+        characters[characterIndex].color = Color.white;
+        characters[characterIndex].rectTransform.localPosition = new Vector3(reflection.LayerData.X, reflection.LayerData.Y, 0);
         characters[characterIndex].rectTransform.sizeDelta = new Vector2(reflection.CharacterData.Width, reflection.CharacterData.Height);
         characters[characterIndex].sprite = spriteManager.GetSpriteByName(reflection.CharacterData.SpriteName);
     }

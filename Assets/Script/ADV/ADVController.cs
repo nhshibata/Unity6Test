@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class ADVController : MonoBehaviour
@@ -10,6 +11,8 @@ public class ADVController : MonoBehaviour
 
     void Start()
     {
+        model.Init();
+
         model.OnPageUpdated += (reflection) => {
             view.DataToUpdate(reflection);
         };
@@ -17,6 +20,7 @@ public class ADVController : MonoBehaviour
         // メッセージウィンドウを押したら次の文を表示
         view.OnNextButtonPressed += () => {
             model.UpdatePage();
+            Debug.Log("massage押されている");
         };
 
         view.OnAutoToggleChanged += (value) => {
@@ -48,7 +52,12 @@ public class ADVController : MonoBehaviour
         };
         
         view.OnQuickLoadPressed += () => {
-            _ = view.FadeManager.FadeInAsync(null, null);
+            _ = view.FadeManager.FadeInAsync(null, () => { 
+                DOVirtual.DelayedCall(1.0f, () => {
+                    _ = view.FadeManager.FadeOutAsync();
+                    model.Load();
+                }, false);    
+            });
         };
 
         view.OnConfigPressed += () => {

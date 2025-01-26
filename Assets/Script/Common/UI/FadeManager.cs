@@ -44,6 +44,7 @@ public class FadeManager : MonoBehaviour
     {
         canvasGroup.alpha = from;
         canvasGroup.blocksRaycasts = true; // フェード中はUIの操作をブロック
+        Debug.Log($"fade実行");
 
         float elapsedTime = 0f;
         while (elapsedTime < duration)

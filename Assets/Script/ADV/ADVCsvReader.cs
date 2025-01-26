@@ -23,6 +23,7 @@ public class ADVCsvReader
         this.textureCsv = textureCsv;
         this.scenarioLabelCsv = scenarioLabelCsv;
         this.scenarioCsv = scenarioCsv;
+        ReadCSV();
     }
 
     public void ReadCSV()
@@ -60,7 +61,7 @@ public class ADVCsvReader
         ScenarioLabelData labelData = FindData(scenarioLabelDataList, l => l.ScenarioId.ToString() == scenario.Argument2);
         ScenarioData nextScenario = nextIndex >= 0 ? scenarioDataList[nextIndex] : null;
 
-        Debug.Log($"ScenarioId: {scenario.ScenarioId}, EventOrder: {scenario.EventOrder}, Text: {scenario.Text}");
+        Debug.Log($"ScenarioId: {scenario.ScenarioId}, EventOrder: {scenario.EventOrder}, Text: {scenario.Text}, Command: {scenario.Command}, Arg1:{scenario.Argument1}, Arg2:{scenario.Argument2}");
 
         if (character != null)
         {
@@ -184,47 +185,59 @@ public class ADVCsvReader
     {
         var dataList = new List<T>();
         string[] lines = csvFile.text.Split('\n');
-        var headerIndexes = GetHeaderIndexes(lines[0], headers);  // ヘッダーインデックスを取得
+        var headerIndexes = GetHeaderIndexes(lines[0], headers);
 
         for (int i = 1; i < lines.Length; i++)
         {
-            if (string.IsNullOrWhiteSpace(lines[i])) 
-                continue;
+            if (string.IsNullOrWhiteSpace(lines[i])) continue;
             string[] fields = lines[i].Split(',');
 
-            if (CheckSkip(fields[0]))
-                continue;
+            if (CheckSkip(fields[0])) continue;
 
-            // headerIndexes を使って fields からデータを取得し、T 型のオブジェクトを作成
-            var data = CreateDataFromFields<T>(fields, headerIndexes);
-            dataList.Add(data);
+            try
+            {
+                // データ作成処理
+                var data = createData(fields);
+                dataList.Add(data);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error processing line {i}: {ex.Message}");
+            }
         }
 
         return dataList;
     }
+
 
     private Dictionary<string, int> GetHeaderIndexes(string headerLine, string[] headers)
     {
         var headerIndexes = new Dictionary<string, int>();
         string[] headerFields = headerLine.Split(',');
 
-        // ヘッダー行を解析して、指定された headers の位置をマッピング
         for (int i = 0; i < headerFields.Length; i++)
         {
             string header = headerFields[i].Trim();
+
+            // ヘッダーが一致しているか確認
             if (System.Array.Exists(headers, h => h == header))
             {
                 headerIndexes[header] = i;
             }
+            else
+            {
+                Debug.LogWarning($"Header '{header}' not found in expected headers.");
+            }
         }
+
         return headerIndexes;
     }
+
 
     private T CreateDataFromFields<T>(string[] fields, Dictionary<string, int> headerIndexes) where T : new()
     {
         var data = new T();
 
-        // ここで headerIndexes を使って、各フィールドに対応するデータを取り出す
         foreach (var headerIndex in headerIndexes)
         {
             string header = headerIndex.Key;
@@ -233,16 +246,30 @@ public class ADVCsvReader
             // フィールド名に基づいてデータを適切にセットする
             var fieldValue = fields[index].Trim();
 
-            // Reflectionを使ってフィールドに値を設定
+            // Reflectionでフィールドにアクセス
             var field = typeof(T).GetField(header);
             if (field != null)
             {
-                field.SetValue(data, Convert.ChangeType(fieldValue, field.FieldType));
+                try
+                {
+                    // フィールドが見つかれば、その型に合わせて値を設定
+                    field.SetValue(data, Convert.ChangeType(fieldValue, field.FieldType));
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error setting field {header} with value {fieldValue}: {ex.Message}");
+                }
+            }
+            else
+            {
+                // フィールドが存在しない場合、警告を出力
+                Debug.LogWarning($"Field {header} not found in {typeof(T).Name}");
             }
         }
 
         return data;
     }
+
 
     private List<LayerData> ReadLayerCsv(TextAsset csvFile)
     {
@@ -311,34 +338,50 @@ public class ADVCsvReader
         string[] headers =
         {
             ScenarioHeaders.ScenarioId,
-            ScenarioHeaders.Text,
             ScenarioHeaders.EventOrder,
-            ScenarioHeaders.Voice,
+            ScenarioHeaders.Command,
             ScenarioHeaders.Argument1,
             ScenarioHeaders.Argument2,
             ScenarioHeaders.Argument3,
+            ScenarioHeaders.Text,
             ScenarioHeaders.Action,
+            ScenarioHeaders.Voice,
             ScenarioHeaders.BranchName,
-            ScenarioHeaders.Command
         };
 
         return ReadCsv(csvFile, headers, (fields) => {
-            var data = new ScenarioData
-            {
-                ScenarioId = int.Parse(fields[Array.IndexOf(headers, ScenarioHeaders.ScenarioId)]),
-                Text = fields[Array.IndexOf(headers, ScenarioHeaders.Text)],
-                EventOrder = int.Parse(fields[Array.IndexOf(headers, ScenarioHeaders.EventOrder)]),
-                Voice = fields[Array.IndexOf(headers, ScenarioHeaders.Voice)],
-                Argument1 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument1)],
-                Argument2 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument2)],
-                Argument3 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument3)],
-                Action = fields[Array.IndexOf(headers, ScenarioHeaders.Action)],
-                BranchName = fields[Array.IndexOf(headers, ScenarioHeaders.BranchName)],
-                Command = fields.Length > Array.IndexOf(headers, ScenarioHeaders.Command) ? fields[Array.IndexOf(headers, ScenarioHeaders.Command)] : ""
-            };
+            var data = new ScenarioData();
+
+            // Try parsing integers safely
+            bool success;
+            data.ScenarioId = TryParseInt(fields[Array.IndexOf(headers, ScenarioHeaders.ScenarioId)], out success);
+            if (!success)
+                Debug.LogError($"Invalid ScenarioId format at line {Array.IndexOf(fields, fields)}");
+
+            data.Text = fields[Array.IndexOf(headers, ScenarioHeaders.Text)];
+            data.EventOrder = TryParseInt(fields[Array.IndexOf(headers, ScenarioHeaders.EventOrder)], out success);
+            if (!success)
+                Debug.LogError($"Invalid EventOrder format at line {Array.IndexOf(fields, fields)}");
+
+            data.Voice = fields[Array.IndexOf(headers, ScenarioHeaders.Voice)];
+            data.Argument1 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument1)];
+            data.Argument2 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument2)];
+            data.Argument3 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument3)];
+            data.Action = fields[Array.IndexOf(headers, ScenarioHeaders.Action)];
+            data.BranchName = fields[Array.IndexOf(headers, ScenarioHeaders.BranchName)];
+            data.Command = fields.Length > Array.IndexOf(headers, ScenarioHeaders.Command) ? fields[Array.IndexOf(headers, ScenarioHeaders.Command)] : "";
+
             return data;
         });
     }
+
+    private int TryParseInt(string value, out bool success)
+    {
+        int result;
+        success = int.TryParse(value, out result);
+        return result;
+    }
+
 
     private bool CheckSkip(string text)
     {

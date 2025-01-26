@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class SpriteManager : MonoBehaviour
@@ -21,21 +22,19 @@ public class SpriteManager : MonoBehaviour
         foreach (var sprite in sprites)
         {
             // Spriteの名前（または任意の識別子）をキーとして保存
-            spriteDictionary[sprite.name] = sprite;
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(sprite.name);
+            spriteDictionary[fileNameWithoutExtension] = sprite;
         }
     }
 
     public Sprite GetSpriteByName(string name)
     {
-        // 名前に一致するSpriteを返す
-        if (spriteDictionary.TryGetValue(name, out Sprite sprite))
+        if (spriteDictionary.ContainsKey(name))
         {
-            return sprite;
+            return spriteDictionary[name];
         }
-        else
-        {
-            Debug.LogWarning("Sprite not found for name: " + name);
-            return null;
-        }
+
+        Debug.LogWarning("Sprite not found for name: " + name);
+        return null;
     }
 }
