@@ -38,41 +38,56 @@ public class CsvReader
     public UIReflection PrintScenarioDetails(int scenarioId, int eventOrder)
     {
         // ScenarioDataを検索
-        ScenarioData scenario = scenarioDataList.Find(s => s.ScenarioId == scenarioId && s.EventOrder == eventOrder);
+        ScenarioData scenario = null;
+        int nextIndex = 0;
+        for (int i = 0; i < scenarioDataList.Count; ++i)
+        {
+            scenario = scenarioDataList[i];
+            if (scenario.ScenarioId == scenarioId && scenario.EventOrder == eventOrder)
+            {
+                nextIndex = i + 1;
+                nextIndex = nextIndex >= scenarioDataList.Count ? -1 : nextIndex;
+                break;
+            }
+        }
 
         if (scenario == null)
             return null;
 
-        // ScenarioDataの情報を表示
+        CharacterData character = FindData(characterDataList, c => c.Id == scenario.Argument1);
+        LayerData layer = FindData(layerDataList, l => l.Id == scenario.Argument2);
+        TextureData texture = FindData(textureDataList, t => t.Id == scenario.Argument1);
+        ScenarioLabelData labelData = FindData(scenarioLabelDataList, l => l.ScenarioId == scenario.Argument2);
+        ScenarioData nextScenario = nextIndex >= 0 ? scenarioDataList[nextIndex] : null;
+
         Debug.Log($"ScenarioId: {scenario.ScenarioId}, EventOrder: {scenario.EventOrder}, Text: {scenario.Text}");
 
-        // CharacterDataを検索
-        CharacterData character = characterDataList.Find(c => c.Id == scenario.Argument1);
         if (character != null)
         {
             Debug.Log($"Character Name: {character.Name}, SpriteName: {character.SpriteName}, Width: {character.Width}, Height: {character.Height}");
         }
 
-        // LayerDataを検索
-        LayerData layer = layerDataList.Find(l => l.Id == scenario.Argument2);
         if (layer != null)
         {
             Debug.Log($"Layer Name: {layer.Name}, Position: ({layer.X}, {layer.Y}), Order: {layer.Order}");
         }
 
-        TextureData texture = textureDataList.Find(l => l.Id == scenario.Argument1);
         if (texture != null)
         {
-
+            Debug.Log($"Texture Name: {texture.ImageName}, Type: {texture.TextureType}, Size: {texture.Size}");
         }
 
-        ScenarioLabelData labelData = scenarioLabelDataList.Find(l => l.ScenarioId == scenario.Argument2);
         if (labelData != null)
         {
-
+            Debug.Log($"Scenario Label Name: {labelData.ScenarioName}, SceneId: {labelData.SceneId}");
         }
 
-        return new UIReflection(layer, character, texture, labelData);
+        return new UIReflection(layer, character, texture, labelData, scenario, nextScenario);
+    }
+
+    private T FindData<T>(List<T> dataList, Predicate<T> match) where T : class
+    {
+        return dataList.Find(match);
     }
 
     [System.Serializable]
@@ -131,16 +146,37 @@ public class CsvReader
     public class UIReflection
     {
         private LayerData layerData = null;
-        private CharacterData characterData = null;
-        private TextureData textureData = null;
-        private ScenarioLabelData scenarioLabelData = null;
+        public LayerData LayerData { get => layerData; }
 
-        public UIReflection(LayerData layerData, CharacterData characterData, TextureData textureData, ScenarioLabelData scenarioLabelData)
+        private CharacterData characterData = null;
+        public CharacterData CharacterData { get => characterData; }
+        
+        private TextureData textureData = null;
+        public TextureData TextureData { get => textureData; }
+        
+        private ScenarioLabelData scenarioLabelData = null;
+        public ScenarioLabelData ScenarioLabelData { get => scenarioLabelData; }
+        
+        private ScenarioData scenarioData = null;
+        public ScenarioData ScenarioData { get => scenarioData; }
+
+        private int nextNo = -1;
+        public int NextNo { get => nextNo; set => nextNo = value; }
+        private int nextOrder = -1;
+        public int NextOrder { get => nextOrder; set => nextOrder = value; }
+
+        public UIReflection(LayerData layerData, CharacterData characterData, TextureData textureData, ScenarioLabelData scenarioLabelData, ScenarioData scenarioData, ScenarioData next)
         {
             this.layerData = layerData;
             this.characterData = characterData;
             this.textureData = textureData;
             this.scenarioLabelData = scenarioLabelData;
+            this.scenarioData = scenarioData;
+            if(next != null)
+            {
+                this.nextNo = next.ScenarioId;
+                this.nextOrder = next.EventOrder;
+            }
         }
     }
 
