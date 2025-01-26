@@ -55,9 +55,9 @@ public class ADVCsvReader
             return null;
 
         CharacterData character = FindData(characterDataList, c => c.SpriteName == scenario.Argument1);
-        LayerData layer = FindData(layerDataList, l => l.Id == scenario.Argument2);
-        TextureData texture = FindData(textureDataList, t => t.Id == scenario.Argument1);
-        ScenarioLabelData labelData = FindData(scenarioLabelDataList, l => l.ScenarioId == scenario.Argument2);
+        LayerData layer = FindData(layerDataList, l => l.Id.ToString() == scenario.Argument2);
+        TextureData texture = FindData(textureDataList, t => t.Id.ToString() == scenario.Argument1);
+        ScenarioLabelData labelData = FindData(scenarioLabelDataList, l => l.ScenarioId.ToString() == scenario.Argument2);
         ScenarioData nextScenario = nextIndex >= 0 ? scenarioDataList[nextIndex] : null;
 
         Debug.Log($"ScenarioId: {scenario.ScenarioId}, EventOrder: {scenario.EventOrder}, Text: {scenario.Text}");
@@ -136,9 +136,9 @@ public class ADVCsvReader
         public string Command;       // 処理文字列
         public string Text;          // ウィンドウに反映する文字列
         public string Voice;         // 今は使用しない
-        public int Argument1;        // CharacterData(ID)
-        public int Argument2;        // LayerDataを参照
-        public int Argument3;        // 番号（列挙体で代用）
+        public string Argument1;        // CharacterData(ID)
+        public string Argument2;        // LayerDataを参照
+        public string Argument3;        // 番号（列挙体で代用）
         public string Action;        // 今は使用しない
         public string BranchName;    // 今は使用しない
     }
@@ -184,16 +184,19 @@ public class ADVCsvReader
     {
         var dataList = new List<T>();
         string[] lines = csvFile.text.Split('\n');
-        var headerIndexes = GetHeaderIndexes(lines[0], headers);
+        var headerIndexes = GetHeaderIndexes(lines[0], headers);  // ヘッダーインデックスを取得
 
         for (int i = 1; i < lines.Length; i++)
         {
-            if (string.IsNullOrWhiteSpace(lines[i])) continue;
+            if (string.IsNullOrWhiteSpace(lines[i])) 
+                continue;
             string[] fields = lines[i].Split(',');
 
-            if (CheckSkip(fields[0])) continue;
+            if (CheckSkip(fields[0]))
+                continue;
 
-            var data = createData(fields);
+            // headerIndexes を使って fields からデータを取得し、T 型のオブジェクトを作成
+            var data = CreateDataFromFields<T>(fields, headerIndexes);
             dataList.Add(data);
         }
 
@@ -205,6 +208,7 @@ public class ADVCsvReader
         var headerIndexes = new Dictionary<string, int>();
         string[] headerFields = headerLine.Split(',');
 
+        // ヘッダー行を解析して、指定された headers の位置をマッピング
         for (int i = 0; i < headerFields.Length; i++)
         {
             string header = headerFields[i].Trim();
@@ -214,6 +218,30 @@ public class ADVCsvReader
             }
         }
         return headerIndexes;
+    }
+
+    private T CreateDataFromFields<T>(string[] fields, Dictionary<string, int> headerIndexes) where T : new()
+    {
+        var data = new T();
+
+        // ここで headerIndexes を使って、各フィールドに対応するデータを取り出す
+        foreach (var headerIndex in headerIndexes)
+        {
+            string header = headerIndex.Key;
+            int index = headerIndex.Value;
+
+            // フィールド名に基づいてデータを適切にセットする
+            var fieldValue = fields[index].Trim();
+
+            // Reflectionを使ってフィールドに値を設定
+            var field = typeof(T).GetField(header);
+            if (field != null)
+            {
+                field.SetValue(data, Convert.ChangeType(fieldValue, field.FieldType));
+            }
+        }
+
+        return data;
     }
 
     private List<LayerData> ReadLayerCsv(TextAsset csvFile)
@@ -301,9 +329,9 @@ public class ADVCsvReader
                 Text = fields[Array.IndexOf(headers, ScenarioHeaders.Text)],
                 EventOrder = int.Parse(fields[Array.IndexOf(headers, ScenarioHeaders.EventOrder)]),
                 Voice = fields[Array.IndexOf(headers, ScenarioHeaders.Voice)],
-                Argument1 = int.Parse(fields[Array.IndexOf(headers, ScenarioHeaders.Argument1)]),
-                Argument2 = int.Parse(fields[Array.IndexOf(headers, ScenarioHeaders.Argument2)]),
-                Argument3 = int.Parse(fields[Array.IndexOf(headers, ScenarioHeaders.Argument3)]),
+                Argument1 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument1)],
+                Argument2 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument2)],
+                Argument3 = fields[Array.IndexOf(headers, ScenarioHeaders.Argument3)],
                 Action = fields[Array.IndexOf(headers, ScenarioHeaders.Action)],
                 BranchName = fields[Array.IndexOf(headers, ScenarioHeaders.BranchName)],
                 Command = fields.Length > Array.IndexOf(headers, ScenarioHeaders.Command) ? fields[Array.IndexOf(headers, ScenarioHeaders.Command)] : ""

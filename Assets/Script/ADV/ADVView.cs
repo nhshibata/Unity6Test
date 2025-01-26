@@ -83,9 +83,14 @@ public class ADVView : MonoBehaviour
     public Action OnLogButtonPressed = null;
     public Action OnNextButtonPressed = null;
 
+    // TODO:あとでちゃんとやる
+    private SpriteManager spriteManager = null;
+
 
     private void Awake()
     {
+        spriteManager = FindFirstObjectByType<SpriteManager>();
+
         // ボタンにイベントを設定
         autoToggle.onValueChanged.AddListener(isOn => OnAutoToggleChanged?.Invoke(isOn));
         saveButton.onClick.AddListener(() => OnSavePressed?.Invoke());
@@ -216,50 +221,88 @@ public class ADVView : MonoBehaviour
         // TODO: 挙動は他ファイルに分割する
         if(reflection.ScenarioData.Command == "Character")
         {
-            int posID = reflection.LayerData.Id;
-            if (!posIndex.ContainsKey(posID))
-            {
-                int charaID = 0;
-                for (int i = 0; i < characters.Count; i++)
-                {
-                    if (!characters[i].gameObject.activeSelf)
-                    {
-                        charaID = i;
-                        break;
-                    }
-                }
-
-                posIndex.Add(posID, charaID);
-            }
-
-            // キャラクター表示切り替え
-            int characterIndex = posIndex[posIndex[posID]];
-            
-            characters[characterIndex].rectTransform.position = new Vector3(reflection.LayerData.X, reflection.LayerData.Y, 0);
-            characters[characterIndex].rectTransform.sizeDelta = new Vector2(reflection.CharacterData.Width, reflection.CharacterData.Height);
-            //characters[characterIndex].sprite = reflection.CharacterData.SpriteName // 一致するSpriteを取得して反映;
-            //reflection.LayerData.Order 描画順を変更(1~)
+            HandleCharacter(reflection);
         }
-        else if(reflection.ScenarioData.Command == "Bg")
+        else if (reflection.ScenarioData.Command == "CharacterOf")
         {
+            HandleCharacterOf(reflection);
+        }
+        else if (reflection.ScenarioData.Command == "Bg")
+        {
+            backGround.sprite = spriteManager.GetSpriteByName(reflection.TextureData.ImageName);
             //backGround.sprite = reflection.TextureData.ImageName; 一致するSpriteを取得
             backGround.transform.localScale = Vector3.one * reflection.TextureData.Size;
         }
         else if(reflection.ScenarioData.Command == "StartScenario")
         {
             // fade処理
-            // 次のorderを取得し反映する
+            //_ = fadeManager.FadeOutAsync();
         }
         else if(reflection.ScenarioData.Command == "EndScenario")
         {
             // fade処理
-            // UIを初期化する
+            _ = fadeManager.FadeOutAsync();
         }
         else if(reflection.ScenarioData.Command == string.Empty)
         {
             dialogueText.text = reflection.ScenarioData.Text;
         }
 
+    }
+
+    private void HandleCharacter(UIReflection reflection)
+    {
+        int posID = reflection.LayerData.Id;
+
+        // キャラクターIDを取得または新規に登録
+        if (!posIndex.ContainsKey(posID))
+        {
+            int charaID = GetAvailableCharacterIndex();
+            posIndex.Add(posID, charaID);
+        }
+
+        // キャラクターの位置やサイズを更新
+        int characterIndex = posIndex[posID];
+        UpdateCharacterPositionAndSize(characterIndex, reflection);
+        //reflection.LayerData.Order 描画順を変更(1~)
+    }
+
+    private void HandleCharacterOf(UIReflection reflection)
+    {
+        int posID = reflection.LayerData.Id;
+
+        // キャラクターの非表示処理
+        if (posIndex.ContainsKey(posID))
+        {
+            int characterIndex = posIndex[posID];
+            HideCharacter(characterIndex);
+        }
+    }
+
+    private int GetAvailableCharacterIndex()
+    {
+        int charaID = 0;
+        for (int i = 0; i < characters.Count; i++)
+        {
+            if (!characters[i].gameObject.activeSelf)
+            {
+                charaID = i;
+                break;
+            }
+        }
+        return charaID;
+    }
+
+    private void HideCharacter(int characterIndex)
+    {
+        characters[characterIndex].gameObject.SetActive(false);
+    }
+
+    private void UpdateCharacterPositionAndSize(int characterIndex, UIReflection reflection)
+    {
+        characters[characterIndex].rectTransform.position = new Vector3(reflection.LayerData.X, reflection.LayerData.Y, 0);
+        characters[characterIndex].rectTransform.sizeDelta = new Vector2(reflection.CharacterData.Width, reflection.CharacterData.Height);
+        characters[characterIndex].sprite = spriteManager.GetSpriteByName(reflection.CharacterData.SpriteName);
     }
 
 }
