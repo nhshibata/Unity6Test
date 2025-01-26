@@ -69,15 +69,13 @@ public class ConfigController : MonoBehaviour
 
     private void Awake()
     {
-        
+        // modelを参照できるように渡す
+        model = new ConfigModel();
+        serviceLocator.RegisterService(model);
     }
 
     private void Start()
     {
-        model = new ConfigModel();
-        serviceLocator.RegisterService(model);
-        model = serviceLocator.GetService<ConfigModel>();
-
         // モデルのデータをUIに反映
         model.ConfigData.Subscribe(config => {
             view.SetConfig(config);

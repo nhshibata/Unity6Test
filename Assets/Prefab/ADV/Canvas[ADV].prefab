@@ -914,8 +914,9 @@ GameObject:
   - component: {fileID: 1380114203351144808}
   - component: {fileID: 2184808956455146447}
   - component: {fileID: 4440695348711552545}
+  - component: {fileID: 5197266955423496587}
   m_Layer: 5
-  m_Name: Contents_Buttons
+  m_Name: 'Contents[Buttons]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -941,7 +942,6 @@ RectTransform:
   - {fileID: 2033375440806485800}
   - {fileID: 1318112524736731896}
   - {fileID: 740066767325011003}
-  - {fileID: 1419069476363877491}
   m_Father: {fileID: 769297031214871701}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
@@ -989,6 +989,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 0
+--- !u!225 &5197266955423496587
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2319023570523742764}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2341716866321051564
 GameObject:
   m_ObjectHideFlags: 0
@@ -1597,7 +1609,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1945,7 +1957,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2183,18 +2195,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3384175870501335654}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6399245916410176281}
   - {fileID: 665034528679707480}
-  m_Father: {fileID: 1380114203351144808}
+  m_Father: {fileID: 769297031214871701}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 750, y: -176}
   m_SizeDelta: {x: 30, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &339312655046235389
@@ -2987,9 +2999,9 @@ GameObject:
   - component: {fileID: 2419542031818851781}
   - component: {fileID: 5133132260586854074}
   - component: {fileID: 1101190092788007951}
-  - component: {fileID: 3833708984759785304}
+  - component: {fileID: 1172042566663942885}
   m_Layer: 5
-  m_Name: 'Button[Auto]'
+  m_Name: 'Toggle[Auto]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3053,7 +3065,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3833708984759785304
+--- !u!114 &1172042566663942885
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3062,7 +3074,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4752270292828410109}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -3075,9 +3087,9 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 1}
+    m_PressedColor: {r: 0.5471698, g: 0.53426486, b: 0.53426486, a: 1}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -3093,10 +3105,14 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 1101190092788007951}
-  m_OnClick:
+  m_TargetGraphic: {fileID: 8561553716659397538}
+  toggleTransition: 1
+  graphic: {fileID: 0}
+  m_Group: {fileID: 0}
+  onValueChanged:
     m_PersistentCalls:
       m_Calls: []
+  m_IsOn: 0
 --- !u!1 &4920985125100094784
 GameObject:
   m_ObjectHideFlags: 0
@@ -4506,20 +4522,21 @@ MonoBehaviour:
   massagePanel: {fileID: 1726402327731348399}
   waitPanel: {fileID: 7013148303391048365}
   tapWaitUI: {fileID: 4755388487454781954}
-  menuContents: {fileID: 769297031214871701}
+  menuContents: {fileID: 5197266955423496587}
   messageLog: {fileID: 6368027708227502240}
   popup: {fileID: 3798959833695567891}
   dialog: {fileID: 3861005096289183096}
   configView: {fileID: 616784793300912515}
   fadeManager: {fileID: 4593158990627934734}
   skipButton: {fileID: 6593717531700173766}
-  autoToggle: {fileID: 339312655046235389}
+  autoToggle: {fileID: 1172042566663942885}
   saveButton: {fileID: 6287464960116722458}
   loadButton: {fileID: 8939886155290636681}
   quickSaveButton: {fileID: 5023644600482076590}
   quickLoadButton: {fileID: 2313581463631568946}
   configButton: {fileID: 1071706890383287336}
   logButton: {fileID: 5147755621711557743}
+  menuSwitchToggle: {fileID: 339312655046235389}
   characters:
   - {fileID: 7223116234838857246}
   - {fileID: 5109775605649751442}
@@ -5804,6 +5821,7 @@ RectTransform:
   - {fileID: 2115377071613573110}
   - {fileID: 6410743108548998905}
   - {fileID: 1380114203351144808}
+  - {fileID: 1419069476363877491}
   - {fileID: 4755388487454781954}
   m_Father: {fileID: 3470219573418235620}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

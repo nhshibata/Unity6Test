@@ -29,7 +29,7 @@ public class ADVView : MonoBehaviour
     [SerializeField]
     private RectTransform tapWaitUI = null;
     [SerializeField]
-    private RectTransform menuContents = null;
+    private CanvasGroup menuContents = null;
     
     [Header("Popup")]
     [SerializeField]
@@ -61,6 +61,8 @@ public class ADVView : MonoBehaviour
     private Button configButton = null;
     [SerializeField]
     private Button logButton = null;
+    [SerializeField]
+    private Toggle menuSwitchToggle = null;
 
     [SerializeField]
     private List<Image> characters = new List<Image>();
@@ -84,9 +86,6 @@ public class ADVView : MonoBehaviour
 
     private void Awake()
     {
-        // 初期設定
-        tapWaitUI.gameObject.SetActive(false);
-
         // ボタンにイベントを設定
         autoToggle.onValueChanged.AddListener(isOn => OnAutoToggleChanged?.Invoke(isOn));
         saveButton.onClick.AddListener(() => OnSavePressed?.Invoke());
@@ -122,6 +121,7 @@ public class ADVView : MonoBehaviour
         // Autoボタン
         OnAutoToggleChanged += (value) => {
             waitPanel.image.raycastTarget = value;
+            autoToggle.targetGraphic.color = value ? Color.red : Color.white;
         };
 
         waitPanel.onClick.AddListener(() => {
@@ -139,6 +139,10 @@ public class ADVView : MonoBehaviour
             _ = popup.ShowMessage(massageMap[AdvMassage.Load]);
         };
 
+        menuSwitchToggle.onValueChanged.AddListener((value) => {
+            menuContents.alpha  = (value ?  1 : 0);
+            menuContents.interactable  = value;
+        });
 
         // Escキーでウィンドウ表示を切り替える処理
         // ※必要なら Input System に置き換え
