@@ -310,6 +310,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "org.nuget.exceldatareader": {
+      "version": "3.7.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://unitynuget-registry.azurewebsites.net"
+    },
     "org.nuget.microsoft.bcl.asyncinterfaces": {
       "version": "6.0.0",
       "depth": 2,

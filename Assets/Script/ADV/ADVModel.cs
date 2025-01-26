@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using static CsvReader;
+using static ADVCsvReader;
 
 public class ADVModel
 {
@@ -30,7 +30,7 @@ public class ADVModel
     private ReactiveProperty<float> autoDelay = new ReactiveProperty<float>(2.0f);
     public ReactiveProperty<float> AutoDelay { get => autoDelay; set => autoDelay = value; }
 
-    private CsvReader csvReader = null;
+    private ADVCsvReader csvReader = null;
 
     private ReactiveProperty<PageData> currentPage = new ReactiveProperty<PageData>(new PageData(1, 1));
     private ReactiveProperty<PageData> nextPage = new ReactiveProperty<PageData>(new PageData(1, 1));
@@ -49,7 +49,7 @@ public class ADVModel
         TextAsset scenarioLabelCsv = null;
         TextAsset scenarioCsv = null;
 
-        csvReader = new CsvReader(layersCsv, characterCsv, textureCsv, scenarioLabelCsv, scenarioCsv);
+        csvReader = new ADVCsvReader(layersCsv, characterCsv, textureCsv, scenarioLabelCsv, scenarioCsv);
         var reflec = csvReader.PrintScenarioDetails(nextPage.Value.ScenarioNo, nextPage.Value.ScenarioOrder);
         currentPage = nextPage;
         nextPage.Value.ScenarioNo = reflec.NextNo;

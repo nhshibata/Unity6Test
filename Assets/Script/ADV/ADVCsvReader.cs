@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CsvReader
+public class ADVCsvReader
 {
     private TextAsset layersCsv = null;
     private TextAsset characterCsv = null;
@@ -16,7 +16,7 @@ public class CsvReader
     private List<ScenarioLabelData> scenarioLabelDataList;
     private List<ScenarioData> scenarioDataList;
 
-    public CsvReader(TextAsset layersCsv, TextAsset characterCsv, TextAsset textureCsv, TextAsset scenarioLabelCsv, TextAsset scenarioCsv)
+    public ADVCsvReader(TextAsset layersCsv, TextAsset characterCsv, TextAsset textureCsv, TextAsset scenarioLabelCsv, TextAsset scenarioCsv)
     {
         this.layersCsv = layersCsv;
         this.characterCsv = characterCsv;

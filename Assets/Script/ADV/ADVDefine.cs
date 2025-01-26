@@ -1,4 +1,3 @@
-// ヘッダーの定数定義
 public static class LayerHeaders
 {
     public const string Id = "id";
