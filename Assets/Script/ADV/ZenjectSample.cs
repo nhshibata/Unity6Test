@@ -21,7 +21,6 @@ public class ZenjectSample : MonoInstaller
 public interface IExample { }
 public class Example : IExample { }
 
-// ServiceLocator
 public class ServiceLocator
 {
     private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
@@ -42,7 +41,6 @@ public class ServiceLocator
     }
 }
 
-// 初期化クラス
 public class ServiceInitializer : IInitializable
 {
     private readonly ServiceLocator _serviceLocator;
