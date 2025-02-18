@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,36 +14,45 @@ public class SudokuView : MonoBehaviour
     private TMP_Text timer = null;
     [SerializeField]
     private TMP_Text messageText = null;
+
     [SerializeField]
     private Toggle numberToggle = null;
-    public Toggle NumberToggle { get => numberToggle; set => numberToggle = value; }
+    public Toggle NumberToggle { get => numberToggle; }
 
     [SerializeField]
     private Button generateButton = null;
-    public Button GenerateButton { get => generateButton; set => generateButton = value; }
+    public Button GenerateButton { get => generateButton; }
+
+    [SerializeField]
+    private Button hintButton = null;
 
     [SerializeField]
     private Dropdown dropdown = null;
-    public Dropdown Dropdown { get => dropdown; set => dropdown = value; }
+    public Dropdown Dropdown { get => dropdown; }
 
     [SerializeField]
-    private Sprite defaultNumberSprite = null;
-    [SerializeField]
-    private Sprite selectNumberSprite = null;
+    private List<EmotionCharacterSprite> characterSpriteManager = new List<EmotionCharacterSprite>();
 
-    [SerializeField]
-    private List<CharacterSpriteManager> characterSpriteManager = new List<CharacterSpriteManager>();
-
-    [SerializeField, Tooltip("1~9の順番とする")]
+    [SerializeField, Tooltip("記入ボタン（1~9の順番とする）")]
     private List<Button> numberButton = new List<Button>();
 
-    [SerializeField, Tooltip("左上から右下の順に格納")]
+    [SerializeField, Tooltip("表示グリッド（左上から右下の順に格納）")]
     private List<NumberGrid> gridNumbers = new List<NumberGrid>();
 
+    [Header("Parameter")]
     [SerializeField]
     private float messageFadeDuration = 2.0f;
 
+    [SerializeField]
+    private Color defaultNumberColor;
+    [SerializeField]
+    private Color selectNumberColor;
+    [SerializeField]
+    private Color completeNumberColor;
+
     private int characterIndex = 0;
+
+    public Action OnHintClick { get; set; }
 
 
     private void Awake()
@@ -54,6 +64,8 @@ public class SudokuView : MonoBehaviour
 
         SetMessage("generate!", false);
         characterSpriteManager.ForEach(obj=>obj.gameObject.SetActive(false));
+
+        hintButton.onClick.AddListener(() => { OnHintClick?.Invoke(); });
     }
 
     /// <summary>
@@ -73,6 +85,11 @@ public class SudokuView : MonoBehaviour
                     gridNumbers[gridIndex].OnCellClicked = onCellClicked;
                 }
             }
+        }
+
+        for (int i = 1; i <= 9; ++i)
+        {
+            CheckNumbers(i);
         }
     }
 
@@ -109,8 +126,7 @@ public class SudokuView : MonoBehaviour
     {
         foreach (var item in numberButton)
         {
-            item.image.sprite = defaultNumberSprite;
-            item.image.color = Color.white;
+            item.image.color = defaultNumberColor;
         }
     }
 
@@ -162,8 +178,7 @@ public class SudokuView : MonoBehaviour
         }
 
         int index = number - 1;
-        numberButton[index].image.sprite = selectNumberSprite;
-        numberButton[index].image.color = Color.black;
+        numberButton[index].image.color = selectNumberColor;
     }
 
     /// <summary>
@@ -181,6 +196,7 @@ public class SudokuView : MonoBehaviour
 
     public void SetMessage(string message, bool isFade)
     {
+        messageText?.DOKill();
         messageText.DOFade(1.0f, 0);
         messageText.text = message.Trim();
         // 徐々に消える
@@ -198,6 +214,23 @@ public class SudokuView : MonoBehaviour
 
         // mm:ss 形式でテキストに反映
         timer.text = $"{minutes:00}:{seconds:00}";
+    }
+
+    public void SetAllCandidateNumber(int[,] data)
+    {
+        for (int row = 0; row < 9; row++)
+        {
+            for (int col = 0; col < 9; col++)
+            {
+                int gridIndex = GetGridIndex(row, col);
+                int cellIndex = GetCellIndex(row, col);
+
+                if (gridIndex >= 0 && cellIndex >= 0)
+                {
+                    gridNumbers[gridIndex].UpdateCandidateNumber(cellIndex, data[row, col]);
+                }
+            }
+        }
     }
 
     public void ChangeCharacter()
@@ -235,7 +268,7 @@ public class SudokuView : MonoBehaviour
 
     public void StartSuccessEffect(int number)
     {
-        characterSpriteManager[characterIndex].ChangeToRandomCharacter();
+        characterSpriteManager[characterIndex].ChangeToRandomCharacter(EmotionCharacterSprite.Emotion.Positive);
         characterSpriteManager[characterIndex].RectAnim.StartAnimation();
 
         int matchCount = 0;
@@ -251,11 +284,33 @@ public class SudokuView : MonoBehaviour
         // 一つの数字が完了していたら
         int index = number - 1;
         numberButton[index].image.raycastTarget = false;
+        numberButton[index].image.color = completeNumberColor;
         foreach (var grid in gridNumbers)
         {
             grid.HighlightNumber(number, NumberGrid.ColorIndex.ClearHighlight);
         }
+    }
 
+    private void CheckNumbers(int number)
+    {
+        int matchCount = 0;
+        foreach (var grid in gridNumbers)
+        {
+            if (grid.MatchNumber(number, null))
+                ++matchCount;
+        }
+
+        if (matchCount != gridNumbers.Count)
+            return;
+
+        // 一つの数字が完了していたら
+        int index = number - 1;
+        numberButton[index].image.raycastTarget = false;
+        numberButton[index].image.color = completeNumberColor;
+        foreach (var grid in gridNumbers)
+        {
+            grid.HighlightNumber(number, NumberGrid.ColorIndex.ClearHighlight);
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using R3;
 using System;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using static SudokuConfig;
 
@@ -8,6 +9,9 @@ public class SudokuModel
 {
     [SerializeField]
     private SudokuGenerator generator = new SudokuGenerator();
+
+    [SerializeField]
+    private SudokuHint hint = new SudokuHint();
 
     [SerializeField]
     private ReactiveProperty<DifficultyLevel> difficulty = new ReactiveProperty<DifficultyLevel>();
@@ -21,6 +25,9 @@ public class SudokuModel
 
     private ReactiveProperty<int[,]> hideGrid = new ReactiveProperty<int[,]>();
     public ReadOnlyReactiveProperty<int[,]> HideGrid => hideGrid;
+    
+    private ReactiveProperty<int[,]> possibleGrid = new ReactiveProperty<int[,]>();
+    public ReactiveProperty<int[,]> PossibleGrid { get => possibleGrid; }
 
     private Subject<Unit> onComplete = new Subject<Unit>();
     public Observable<Unit> OnComplete => onComplete;
@@ -30,7 +37,11 @@ public class SudokuModel
 
     // TODO:ミス回数を記録
     // TODO:スコアを記録
+    // TODO:ヒント押下回数
 
+    /// <summary>
+    /// 現在のシード値
+    /// </summary>
     private int seed;
 
 
@@ -45,6 +56,7 @@ public class SudokuModel
 
         generator.GenerateSudoku(seed);
         hideGrid.Value = generator.GridToHide(SudokuConfig.GetHiddenCountByDifficulty(difficulty.Value));
+        possibleGrid.Value = (int[,])hideGrid.Value.Clone();
     }
 
     /// <summary>
@@ -81,6 +93,7 @@ public class SudokuModel
         var grid = hideGrid.Value;
         grid[y, x] = number;
         hideGrid.Value = grid;
+        SetPossibleGrid(x, y, number);
 
         if (IsComplete())
         {
@@ -101,4 +114,44 @@ public class SudokuModel
         isGame.Value = false;
         return true;
     }
+
+    public void SetPossibleGrid(int x, int y, int number)
+    {
+        var grid = possibleGrid.Value;
+        grid[y, x] = number;
+        grid = hint.RemoveGrid(grid);
+        possibleGrid.Value = grid;
+    }
+
+    /// <summary>
+    /// 数字候補を更新
+    /// </summary>
+    public void UpdatePossibleGrid(int x, int y, int number)
+    {
+        var grid = possibleGrid.Value;
+        int candidateBits = grid[y, x];
+        int bit = 1 << (number - 1);
+
+        if ((candidateBits & bit) != 0)
+        {
+            candidateBits &= ~bit;
+        }
+        else
+        {
+            candidateBits |= bit;
+        }
+
+        grid[y, x] = candidateBits;
+        possibleGrid.Value = grid;
+    }
+
+    public int[,] GetHintGenerate()
+    {
+        int hintNumber = UnityEngine.Random.Range(1, 9);
+        var grid = hint.GetHint(possibleGrid.Value, hintNumber);
+        //grid = hint.GetAllHint(possibleGrid.Value);
+        possibleGrid.Value = grid;
+        return grid;
+    }
+
 }

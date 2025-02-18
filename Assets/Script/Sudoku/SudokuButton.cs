@@ -1,6 +1,10 @@
 ﻿using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// 数独用のボタン
+/// 元のButtonと表示Textに加えて候補の数字用のTextを追加
+/// </summary>
 public class SudokuButton : ButtonBinder
 {
     [SerializeField]
@@ -33,6 +37,12 @@ public class SudokuButton : ButtonBinder
             candidateBits |= bit;
         }
 
+        UpdateCandidateText();
+    }
+
+    public void UpdateCandidateNumber(int bits)
+    {
+        candidateBits = bits;
         UpdateCandidateText();
     }
 
