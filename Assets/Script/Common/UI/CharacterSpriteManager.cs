@@ -1,59 +1,30 @@
-﻿using DG.Tweening;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class CharacterSpriteManager : MonoBehaviour
+public class CharacterSpriteManager : CharacterSpriteManagerBase
 {
-    private const int DEFAULT_FACE = 0;
-
-    [SerializeField]
-    private Image image = null;
-    [SerializeField]
-    private RectTransformAnimator rectAnim;
-    public RectTransformAnimator RectAnim { get => rectAnim; }
+    [Header("Refarence")]
     [SerializeField]
     private List<Sprite> charSprites;
 
+    [Header("Parameters")]
     [SerializeField]
-    private float fadeDuration = 0.5f;
+    private int defaultFace = 0;
 
 
     public void Awake()
     {
-        ChangeSprite(charSprites[DEFAULT_FACE]);
+        ChangeSprite(charSprites[defaultFace]);
     }
 
-    public void ChangeToRandomCharacter()
+    public override void ChangeToRandomCharacter()
     {
-        int index = UnityEngine.Random.Range(DEFAULT_FACE + 1, charSprites.Count);
+        int index = UnityEngine.Random.Range(defaultFace + 1, charSprites.Count);
         ChangeSprite(charSprites[index]);
     }
 
-    public void ResetToDefaultCharacter()
+    public override void ResetToDefaultCharacter()
     {
-        ChangeSprite(charSprites[DEFAULT_FACE]);
+        ChangeSprite(charSprites[defaultFace]);
     }
-
-    /// <summary>
-    /// 画像のスプライトを変更
-    /// </summary>
-    public void ChangeSprite(Sprite sprite)
-    {
-        image.sprite = sprite;
-    }
-
-    public void StartBlackFade(Action<Image> onStart, Action onComplete)
-    {
-        onStart?.Invoke(image);
-        image.DOColor(Color.black, fadeDuration).OnComplete(()=>onComplete?.Invoke());
-    }
-    
-    public void StartWhiteFade(Action<Image> onStart, Action onComplete)
-    {
-        onStart?.Invoke(image);
-        image.DOColor(Color.white, fadeDuration).OnComplete(()=>onComplete?.Invoke());
-    }
-
 }
