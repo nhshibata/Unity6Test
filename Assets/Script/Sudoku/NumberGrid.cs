@@ -12,9 +12,9 @@ public class NumberGrid : MonoBehaviour
     }
 
     private static readonly int CELL_SIZE = 3;
-    private static Color defaultColor = Color.black;
-    private static Color highlightColor = Color.blue;
-    private static Color clearHighlightColor = Color.green;
+    private static readonly Color defaultColor = Color.black;
+    private static readonly Color highlightColor = Color.blue * 0.9f + new Color(0, 0, 0, 1);
+    private static readonly Color clearHighlightColor = Color.green * 0.9f + new Color(0, 0, 0, 1);
 
     [SerializeField]
     private List<SudokuButton> cells = new List<SudokuButton>();
@@ -46,7 +46,7 @@ public class NumberGrid : MonoBehaviour
 
         for (int i = 0; i < cells.Count; i++)
         {
-            int localIndex = i; // キャプチャ対策でローカル変数に格納
+            int localIndex = i; // キャプチャ対策
             cells[localIndex].Button.onClick.AddListener(() =>
             {
                 // ボタンが押されたときに (x, y) を計算してコールバック
@@ -69,12 +69,8 @@ public class NumberGrid : MonoBehaviour
     }
 
     /// <summary>
-    /// 指定したインデックスに数字を設定し、任意で色を指定
+    /// 指定したインデックスに数字を設定
     /// </summary>
-    /// <param name="index">セルのインデックス</param>
-    /// <param name="number">設定する数字</param>
-    /// <param name="size">グリッドのサイズ</param>
-    /// <param name="color">任意の色 (nullの場合はデフォルト色)</param>
     public void SetNumber(int index, int number)
     {
         var cell = cells[index];
@@ -89,14 +85,20 @@ public class NumberGrid : MonoBehaviour
             cell.Text.text = number.ToString();
             cell.SetCandidateEnable(false);
             cell.Button.image.raycastTarget = false;
+            HighlightNumber(number, NumberGrid.ColorIndex.Highlight);
         }
-
     }
 
     public void SetCandidateNumber(int index, int number)
     {
         var cell = cells[index];
         cell.SetCandidateNumber(number);
+    }
+    
+    public void UpdateCandidateNumber(int index, int number)
+    {
+        var cell = cells[index];
+        cell.UpdateCandidateNumber(number);
     }
 
     public bool MatchNumber(int number, Action<TMPro.TMP_Text> onMatchFound)

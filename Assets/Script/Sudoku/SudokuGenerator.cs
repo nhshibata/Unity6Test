@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 public class SudokuGenerator
 {
@@ -32,7 +31,7 @@ public class SudokuGenerator
             catch (Exception ex)
             {
                 // エラーが発生した場合の処理
-                Console.WriteLine($"Retrying Sudoku generation... (Attempt {retries + 1}): {ex.Message}");
+                UnityEngine.Debug.Log($"Retrying Sudoku generation... (Attempt {retries + 1}): {ex.Message}");
                 Array.Clear(grid, 0, grid.Length); // グリッドをリセット
                 retries++;
             }
@@ -43,13 +42,12 @@ public class SudokuGenerator
 
     public int[,] GridToHide(int hideCount)
     {
-        RemoveNumbers(hideCount);       // 解から数字を取り除いて問題盤面を生成
+        hideGrid = RemoveNumbers(hideCount);       // 解から数字を取り除いて問題盤面を生成
         HumanLikeSudokuSolver human = new HumanLikeSudokuSolver();
         human.Solve(hideGrid);
         return hideGrid;
     }
 
-    // 数独を解く
     private bool FillGrid()
     {
         var numbers = new List<int>(System.Linq.Enumerable.Range(1, 9));
@@ -82,43 +80,72 @@ public class SudokuGenerator
         return true; // すべてのセルが埋まった場合、trueを返す
     }
 
-    // 問題盤面を生成（難易度に応じて穴をあける数を調整）
-    private void RemoveNumbers(int hideCount)
+    public int[,] RemoveNumbers(int holes)
     {
-        Array.Copy(grid, hideGrid, grid.Length); // 解をコピー
-
-        int holesPlaced = 0;
-        while (holesPlaced < hideCount)
+        int[,] gridCopy = (int[,])grid.Clone();
+        List<(int, int)> cells = new List<(int, int)>();
+        for (int row = 0; row < 9; row++)
         {
-            int row = random.Next(0, 9);
-            int col = random.Next(0, 9);
-
-            // すでに穴があいている場合はスキップ
-            if (hideGrid[row, col] == 0)
-                continue;
-
-            // 数字を隠す
-            hideGrid[row, col] = 0;
-            holesPlaced++;
+            for (int col = 0; col < 9; col++)
+            {
+                cells.Add((row, col));
+            }
         }
+
+        ShuffleList(cells);
+        int removed = 0;
+
+        foreach (var (row, col) in cells)
+        {
+            if (removed >= holes)
+            {
+                break;
+            }
+
+            int originalValue = gridCopy[row, col];
+            gridCopy[row, col] = 0;
+
+            if (!HasUniqueSolution(gridCopy))
+            {
+                gridCopy[row, col] = originalValue;
+            }
+            else
+            {
+                removed++;
+            }
+        }
+
+        UnityEngine.Debug.Log($"空けた数{removed}");
+
+        return gridCopy;
     }
 
-    // その数字を置いて安全かどうかチェック
     private bool IsSafe(int row, int col, int num)
     {
-        for (int i = 0; i < 9; i++)
+        // 行チェック
+        for (int c = 0; c < 9; c++)
         {
-            if (grid[row, i] == num || grid[i, col] == num)
+            if (grid[row, c] == num)
             {
                 return false;
             }
         }
 
-        int boxRow = (row / 3) * 3;
-        int boxCol = (col / 3) * 3;
-        for (int r = boxRow; r < boxRow + 3; r++)
+        // 列チェック
+        for (int r = 0; r < 9; r++)
         {
-            for (int c = boxCol; c < boxCol + 3; c++)
+            if (grid[r, col] == num)
+            {
+                return false;
+            }
+        }
+
+        // ボックスチェック
+        int boxStartRow = 3 * (row / 3);
+        int boxStartCol = 3 * (col / 3);
+        for (int r = boxStartRow; r < boxStartRow + 3; r++)
+        {
+            for (int c = boxStartCol; c < boxStartCol + 3; c++)
             {
                 if (grid[r, c] == num)
                 {
@@ -126,17 +153,17 @@ public class SudokuGenerator
                 }
             }
         }
+
         return true;
     }
 
-    // 盤面がすべて埋まっているかチェック
     private bool IsFilled()
     {
-        for (int i = 0; i < 9; i++)
+        for (int row = 0; row < 9; row++)
         {
-            for (int j = 0; j < 9; j++)
+            for (int col = 0; col < 9; col++)
             {
-                if (grid[i, j] == 0)
+                if (grid[row, col] == 0)
                 {
                     return false;
                 }
@@ -145,7 +172,6 @@ public class SudokuGenerator
         return true;
     }
 
-    // リストをシャッフルする
     private void Shuffle(List<int> numbers)
     {
         for (int i = numbers.Count - 1; i > 0; i--)
@@ -157,48 +183,86 @@ public class SudokuGenerator
         }
     }
 
-
-    public void ExportGridToCsv(int[,] grid, string filePath)
+    private bool HasUniqueSolution(int[,] grid)
     {
-        using (StreamWriter writer = new StreamWriter(filePath))
-        {
-            for (int i = 0; i < 9; i++)
-            {
-                string row = string.Join(",", GetRow(grid, i));
-                writer.WriteLine(row);
+        int solutionCount = 0;
 
-                if ((i + 1) % 3 == 0)
+        void Solve()
+        {
+            for (int i = 0; i < 81; i++)
+            {
+                int row = i / 9;
+                int col = i % 9;
+                if (grid[row, col] == 0)
                 {
-                    row = "---------,"; // 3行ごとに区切りを入れる
-                    writer.WriteLine(row);
+                    for (int num = 1; num <= 9; num++)
+                    {
+                        if (IsSafeForGrid(grid, row, col, num))
+                        {
+                            grid[row, col] = num;
+                            Solve();
+                            grid[row, col] = 0;
+                        }
+                    }
+                    return;
+                }
+            }
+            solutionCount++;
+            if (solutionCount > 1)
+            {
+                return;
+            }
+        }
+
+        Solve();
+        return solutionCount == 1;
+    }
+
+    private bool IsSafeForGrid(int[,] grid, int row, int col, int num)
+    {
+        // 行チェック
+        for (int c = 0; c < 9; c++)
+        {
+            if (grid[row, c] == num)
+            {
+                return false;
+            }
+        }
+
+        // 列チェック
+        for (int r = 0; r < 9; r++)
+        {
+            if (grid[r, col] == num)
+            {
+                return false;
+            }
+        }
+
+        // ボックスチェック
+        int boxStartRow = 3 * (row / 3);
+        int boxStartCol = 3 * (col / 3);
+        for (int r = boxStartRow; r < boxStartRow + 3; r++)
+        {
+            for (int c = boxStartCol; c < boxStartCol + 3; c++)
+            {
+                if (grid[r, c] == num)
+                {
+                    return false;
                 }
             }
         }
+
+        return true;
     }
 
-    private int[] GetRow(int[,] grid, int rowIndex)
+    private void ShuffleList<T>(List<T> list)
     {
-        int[] row = new int[9];
-        for (int j = 0; j < 9; j++)
-        {
-            row[j] = grid[rowIndex, j];
-        }
-        return row;
-    }
-}
-
-
-public static class ListExtensions
-{
-    // List<T>をシャッフルする拡張メソッド
-    public static void Shuffle<T>(this IList<T> list)
-    {
-        Random rand = new Random();
+        Random rng = new Random();
         int n = list.Count;
         while (n > 1)
         {
             n--;
-            int k = rand.Next(n + 1);
+            int k = rng.Next(n + 1);
             T value = list[k];
             list[k] = list[n];
             list[n] = value;

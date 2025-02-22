@@ -3,6 +3,9 @@ using R3;
 using UnityEngine;
 using static SudokuConfig;
 
+/// <summary>
+/// 数独管理クラス
+/// </summary>
 public class SudokuManager : MonoBehaviour
 {
     [SerializeField]
@@ -31,20 +34,30 @@ public class SudokuManager : MonoBehaviour
             model.SelectNumber.Value = value;
         });
 
-        // セルが押された際の処理
-        view.Initialize((x, y, grid) =>
+        // ヒント
+        view.OnHintClick += () => {
+            var grid = model.GetHintGenerate();
+            view.SetAllCandidateNumber(grid);
+        };
+
+        // セルが押された際の処理を追加
+        view.Initialize((x, y, gridView) =>
         {
             bool isCorrect = model.CheckNumber(x, y);
             int select = model.SelectNumber.Value;
+
+            // 数字記入か候補記入か
             if (!view.NumberToggle.isOn)
             {
                 if (isCorrect)
                 {
-                    grid.SetNumber(NumberGrid.PosToIndex(x, y), select);
-                    model.SetNumber(x, y, select);
-                    view.StartSuccessEffect(select);
                     // 文言はviewに任せるべき？
                     view.SetMessage($"{select} is the correct answer!", true);
+
+                    model.SetNumber(x, y, select);
+                    gridView.SetNumber(NumberGrid.PosToIndex(x, y), select);
+                    view.SetAllCandidateNumber(model.PossibleGrid.Value);
+                    view.StartSuccessEffect(select);
                 }
                 else
                 {
@@ -53,7 +66,8 @@ public class SudokuManager : MonoBehaviour
             }
             else
             {
-                grid.SetCandidateNumber(NumberGrid.PosToIndex(x, y), select);
+                gridView.SetCandidateNumber(NumberGrid.PosToIndex(x, y), select);
+                model.UpdatePossibleGrid(x, y, select);
             }
         });
 
@@ -100,6 +114,7 @@ public class SudokuManager : MonoBehaviour
         view.ReStart();
         model.Generate();
         view.SetGridData(model.HideGrid.CurrentValue);
+        view.SetAllCandidateNumber(model.PossibleGrid.Value);
     }
 
 }
