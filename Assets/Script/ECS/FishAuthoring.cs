@@ -27,7 +27,7 @@ public class FishBaker : Baker<FishAuthoring>
 {
     public override void Bake(FishAuthoring fishAuthoring)
     {
-        // 移動を行うため動的
+        // 移動を行うため動的（LocalTransform が付与される）
         var entity = GetEntity(TransformUsageFlags.Dynamic);
 
         AddComponent(entity, new Fish()

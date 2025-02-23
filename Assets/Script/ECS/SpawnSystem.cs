@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))] // 他のシステムより優先的に更新
 public partial struct SpawnSystem : ISystem
@@ -13,23 +14,31 @@ public partial struct SpawnSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (school, param, entity) in SystemAPI.Query<RefRW<School>,RefRO<Parameter>>().WithEntityAccess())
+        int cnt =0;
+        foreach (var (school, param, lt, ptm, entity) in SystemAPI.Query<RefRW<School>, RefRO<Parameter>, RefRO<LocalTransform>, RefRO<PostTransformMatrix>>().WithEntityAccess())
         {
+            ++cnt;
             if (school.ValueRO.initialized)
                 continue;
-            Create(ref state, school.ValueRO, param.ValueRO, entity);
+
+            var localTransform = lt.ValueRO.ToMatrix();
+            var scaleTransform = ptm.ValueRO.Value;
+            var transform = math.mul(localTransform, scaleTransform);
+
+            Create(ref state, school.ValueRO, param.ValueRO, transform,  entity);
             school.ValueRW.initialized = true;
         }
+        Debug.Log($"{cnt}");
     }
 
-    void Create(ref SystemState state, in School school, in Parameter param, Entity groupEntity)
+    void Create(ref SystemState state, in School school, in Parameter param, in float4x4 areaTransform, Entity groupEntity)
     {
         var entities = state.EntityManager.Instantiate(
             school.prefab,
             school.spawnCount,
             Allocator.Temp);
 
-        var random = new Random(school.randomSeed);
+        var random = new Unity.Mathematics.Random(school.randomSeed);
 
         foreach (var entity in entities)
         {
@@ -39,7 +48,9 @@ public partial struct SpawnSystem : ISystem
             var lt = SystemAPI.GetComponentRW<LocalTransform>(entity);
 
             var pos = random.NextFloat3() - 0.5f;
+            //pos *= 5.0f; // 適当な範囲
             pos *= 5.0f; // 適当な範囲
+            lt.ValueRW.Position = math.transform(areaTransform, pos);
             lt.ValueRW.Position = pos;
 
             var dir = random.NextFloat3Direction();

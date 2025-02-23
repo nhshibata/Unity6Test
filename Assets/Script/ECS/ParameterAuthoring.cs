@@ -93,8 +93,10 @@ public class ParameterBaker : Baker<ParameterAuthoring>
 {
     public override void Bake(ParameterAuthoring src)
     {
-        var entity = GetEntity(TransformUsageFlags.None);
-        // 直接セットする
+        var entity = GetEntity(TransformUsageFlags.Dynamic);
+        // scaleをxyz同一以外で扱う為にPostTransformMatrix を付与する
+        AddTransformUsageFlags(entity, TransformUsageFlags.NonUniformScale);
+        // 直接セット
         AddComponent(entity, src.param);
     }
 }
