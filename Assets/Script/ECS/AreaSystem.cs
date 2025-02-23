@@ -1,11 +1,11 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 public partial struct AreaSystem : ISystem
 {
     private ComponentLookup<Parameter> paramLookUp;
+
 
     public void OnCreate(ref SystemState state)
     {
@@ -16,10 +16,7 @@ public partial struct AreaSystem : ISystem
     {
         paramLookUp.Update(ref state);
 
-        foreach (var (fish, lt) in
-            SystemAPI.Query<
-                RefRW<Fish>,
-                RefRO<LocalTransform>>())
+        foreach (var (fish, lt) in SystemAPI.Query<RefRW<Fish>, RefRO<LocalTransform>>())
         {
             var param = paramLookUp[fish.ValueRW.paramEntity];
             var scale = param.areaScale * 0.5f;

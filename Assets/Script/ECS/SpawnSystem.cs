@@ -13,10 +13,7 @@ public partial struct SpawnSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (school, param, entity) in
-            SystemAPI.Query<
-                RefRW<School>,
-                RefRO<Parameter>>().WithEntityAccess()) // Entity も取得
+        foreach (var (school, param, entity) in SystemAPI.Query<RefRW<School>,RefRO<Parameter>>().WithEntityAccess())
         {
             if (school.ValueRO.initialized)
                 continue;
@@ -25,11 +22,7 @@ public partial struct SpawnSystem : ISystem
         }
     }
 
-    void Create(
-        ref SystemState state,
-        in School school,
-        in Parameter param,
-        Entity groupEntity)
+    void Create(ref SystemState state, in School school, in Parameter param, Entity groupEntity)
     {
         var entities = state.EntityManager.Instantiate(
             school.prefab,

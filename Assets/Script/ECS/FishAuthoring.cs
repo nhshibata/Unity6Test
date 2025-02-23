@@ -1,7 +1,12 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 using UnityEngine;
+
+[InternalBufferCapacity(8)] // 指定分のバッファをインライン展開
+public struct NeighborsEntityBufferElement : IBufferElementData
+{
+    public Entity entity;
+}
 
 public struct Fish : IComponentData
 {
@@ -31,42 +36,8 @@ public class FishBaker : Baker<FishAuthoring>
             acceleration = 0.0f,
             paramEntity = Entity.Null,
         });
-    }
-
-}
-
-public partial struct MoveSystem : ISystem
-{
-    private ComponentLookup<Parameter> paramLookUp;
-
-    public void OnCreate(ref SystemState state)
-    {
-        paramLookUp = state.GetComponentLookup<Parameter>(true);
-    }
-
-    public void OnUpdate(ref SystemState state)
-    {
-        // チャンクが再構築された時のために更新
-        paramLookUp.Update(ref state);
-
-        var dt = SystemAPI.Time.DeltaTime;
-
-        // 指定したコンポーネントを所持するEntityを取得
-        foreach (var (fish, lt) in
-            SystemAPI.Query<
-                RefRW<Fish>,
-                RefRW<LocalTransform>>())
-        {
-            var param = paramLookUp[fish.ValueRO.paramEntity];
-
-            fish.ValueRW.velocity += fish.ValueRO.acceleration * dt;
-            var speed = math.length(fish.ValueRO.velocity);
-            speed = math.clamp(speed, param.minSpeed, param.maxSpeed);
-            var dir = math.normalize(fish.ValueRO.velocity);
-            var up = math.up();
-            fish.ValueRW.velocity = dir * speed;
-            lt.ValueRW.Rotation = quaternion.LookRotationSafe(dir, up);
-            lt.ValueRW.Position += fish.ValueRO.velocity * dt;
-        }
+        
+        // エンティティにDynamicBufferを付与
+        AddBuffer<NeighborsEntityBufferElement>(entity);
     }
 }
