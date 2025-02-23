@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 254335725}
   - component: {fileID: 254335724}
   - component: {fileID: 254335723}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Boostrap_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -149,20 +149,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c863f483b0cc54b9584bd8384b1b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeed: 2
-  maxSpeed: 5
-  areaScale:
-    x: 5
-    y: 5
-    z: 5
-  areaDistance: 3
-  areaForce: 1
-  neighborDistance: 1
-  neighborFov: 90
-  neighborAngle: 0
-  separationForce: 5
-  alignmentForce: 2
-  cohesionForce: 2
+  param:
+    type: 0
+    MinSpeed: 0
+    minSpeed: 2
+    maxSpeed: 5
+    areaScale:
+      x: 5
+      y: 5
+      z: 5
+    areaDistance: 3
+    areaForce: 1
+    neighborDistance: 1
+    neighborFov: 90
+    neighborAngle: 30
+    separationForce: 5
+    alignmentForce: 5
+    cohesionForce: 5
 --- !u!114 &254335724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,7 +208,7 @@ GameObject:
   - component: {fileID: 2012986456}
   - component: {fileID: 2012986457}
   - component: {fileID: 2012986458}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Boostrap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -255,20 +258,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c863f483b0cc54b9584bd8384b1b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeed: 2
-  maxSpeed: 5
-  areaScale:
-    x: 5
-    y: 5
-    z: 5
-  areaDistance: 3
-  areaForce: 1
-  neighborDistance: 1
-  neighborFov: 90
-  neighborAngle: 0
-  separationForce: 5
-  alignmentForce: 2
-  cohesionForce: 2
+  param:
+    type: 0
+    MinSpeed: 0
+    minSpeed: 2
+    maxSpeed: 5
+    areaScale:
+      x: 5
+      y: 5
+      z: 5
+    areaDistance: 3
+    areaForce: 1
+    neighborDistance: 1
+    neighborFov: 90
+    neighborAngle: 90
+    separationForce: 5
+    alignmentForce: 5
+    cohesionForce: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
