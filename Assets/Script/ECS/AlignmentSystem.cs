@@ -38,7 +38,7 @@ public partial struct AlignmentSystem : ISystem
             var param = paramLookUp[fish.ValueRW.paramEntity];
             var v = fish.ValueRO.velocity;
 
-            fish.ValueRW.acceleration += (averageV - v) * param.separationForce;
+            fish.ValueRW.acceleration += (averageV - v) * param.alignmentForce;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Unity.Entities;
-using Unity.Entities.UniversalDelegates;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -26,15 +25,22 @@ public partial struct MoveSystem : ISystem
         {
             var param = paramLookUp[fish.ValueRO.paramEntity];
 
-            fish.ValueRW.velocity += fish.ValueRO.acceleration * dt;
-            var speed = math.length(fish.ValueRO.velocity);
-            var dir = math.normalize(fish.ValueRO.velocity);
-            var up = math.up();
-
+            var v = fish.ValueRO.velocity;
+            v += fish.ValueRO.acceleration * dt;
+            var speed = math.length(v);
             speed = math.clamp(speed, param.minSpeed, param.maxSpeed);
-            fish.ValueRW.velocity = dir * speed;
+            var dir = math.normalize(v);
+            v = dir * speed;
+            fish.ValueRW.velocity = v;
+
+            fish.ValueRW.acceleration = 0f;
+
+            var pos = lt.ValueRO.Position;
+            pos += fish.ValueRO.velocity * dt;
+            lt.ValueRW.Position = pos;
+
+            var up = math.up();
             lt.ValueRW.Rotation = quaternion.LookRotationSafe(dir, up);
-            lt.ValueRW.Position += fish.ValueRO.velocity * dt;
             Debug.DrawRay(lt.ValueRW.Position, fish.ValueRO.velocity * 0.3f, Color.green, 0f, true);
         }
     }

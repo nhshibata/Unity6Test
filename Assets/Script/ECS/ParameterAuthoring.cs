@@ -11,12 +11,11 @@ public struct Parameter : IComponentData
     public float minSpeed;
     public float maxSpeed;
     [Header("Area")]
-    public float3 areaScale;
     public float areaDistance;
     public float areaForce;
+    public float3 debugAreaColor;
     [Header("Neighbors")]
     public float neighborDistance;
-    public float neighborFov;
     public float neighborAngle;
     [Header("Separation")]
     public float separationForce;
@@ -33,11 +32,10 @@ public struct Parameter : IComponentData
             type = 0,
             minSpeed = 2f,
             maxSpeed = 5f,
-            areaScale = 5f,
             areaDistance = 3f,
             areaForce = 1f,
+            debugAreaColor = new float3(1, 1, 0),
             neighborDistance = 1f,
-            neighborFov = 90.0f,
             neighborAngle = 90f,
             separationForce = 5f,
             alignmentForce = 5f,

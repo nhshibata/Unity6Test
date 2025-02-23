@@ -151,18 +151,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   param:
     type: 0
-    MinSpeed: 0
     minSpeed: 2
     maxSpeed: 5
-    areaScale:
-      x: 5
-      y: 5
-      z: 5
-    areaDistance: 3
-    areaForce: 1
+    areaDistance: 90
+    areaForce: 3
+    debugAreaColor:
+      x: 1
+      y: 1
+      z: 0
     neighborDistance: 1
-    neighborFov: 90
-    neighborAngle: 30
+    neighborAngle: 90
     separationForce: 5
     alignmentForce: 5
     cohesionForce: 5
@@ -180,7 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 654176432500614637, guid: 6b7b5761190e1d34085f31733e63b786, type: 3}
   spawnCount: 100
-  randomSeed: 10
+  randomSeed: 100
   initialized: 0
 --- !u!4 &254335725
 Transform:
@@ -191,8 +189,8 @@ Transform:
   m_GameObject: {fileID: 254335722}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 2.5, y: 0.01, z: -2.2}
+  m_LocalScale: {x: 5, y: 10, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -223,13 +221,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2012986454}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0.9554331, z: -0.29520786, w: 0}
+  m_LocalPosition: {x: -9.25, y: 3.59, z: 0}
+  m_LocalScale: {x: 5, y: 5, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 34.34, y: 180, z: 0}
 --- !u!114 &2012986457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 4770912626054304161, guid: eef6bb306465b314cae8f64ced325124, type: 3}
   spawnCount: 100
-  randomSeed: 100
+  randomSeed: 15
   initialized: 0
 --- !u!114 &2012986458
 MonoBehaviour:
@@ -259,18 +257,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   param:
-    type: 0
-    MinSpeed: 0
+    type: 1
     minSpeed: 2
     maxSpeed: 5
-    areaScale:
-      x: 5
-      y: 5
-      z: 5
     areaDistance: 3
     areaForce: 1
+    debugAreaColor:
+      x: 1
+      y: 1
+      z: 0
     neighborDistance: 1
-    neighborFov: 90
     neighborAngle: 90
     separationForce: 5
     alignmentForce: 5

@@ -19,11 +19,14 @@ public partial struct CohesionSystem : ISystem
         paramLookUp.Update(ref state);
         transformLookUp.Update(ref state);
 
-        foreach (var (fish, lt, neighbors) in SystemAPI.Query<RefRW<Fish>, RefRW<LocalTransform>, DynamicBuffer<NeighborsEntityBufferElement>>())
+        foreach (var (fish, lt, neighbors) in
+            SystemAPI.Query<
+                RefRW<Fish>,
+                RefRO<LocalTransform>,
+                DynamicBuffer<NeighborsEntityBufferElement>>())
         {
             var n = neighbors.Length;
-            if (n == 0) 
-                continue;
+            if (n == 0) continue;
 
             var averagePos = float3.zero;
             for (int i = 0; i < n; ++i)
@@ -36,7 +39,7 @@ public partial struct CohesionSystem : ISystem
 
             var pos = lt.ValueRO.Position;
             var param = paramLookUp[fish.ValueRW.paramEntity];
-            fish.ValueRW.acceleration += (averagePos - pos) * param.separationForce;
+            fish.ValueRW.acceleration += (averagePos - pos) * param.cohesionForce;
         }
     }
 }

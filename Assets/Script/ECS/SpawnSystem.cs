@@ -14,10 +14,8 @@ public partial struct SpawnSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        int cnt =0;
         foreach (var (school, param, lt, ptm, entity) in SystemAPI.Query<RefRW<School>, RefRO<Parameter>, RefRO<LocalTransform>, RefRO<PostTransformMatrix>>().WithEntityAccess())
         {
-            ++cnt;
             if (school.ValueRO.initialized)
                 continue;
 
@@ -28,7 +26,6 @@ public partial struct SpawnSystem : ISystem
             Create(ref state, school.ValueRO, param.ValueRO, transform,  entity);
             school.ValueRW.initialized = true;
         }
-        Debug.Log($"{cnt}");
     }
 
     void Create(ref SystemState state, in School school, in Parameter param, in float4x4 areaTransform, Entity groupEntity)
@@ -48,7 +45,6 @@ public partial struct SpawnSystem : ISystem
             var lt = SystemAPI.GetComponentRW<LocalTransform>(entity);
 
             var pos = random.NextFloat3() - 0.5f;
-            //pos *= 5.0f; // 適当な範囲
             pos *= 5.0f; // 適当な範囲
             lt.ValueRW.Position = math.transform(areaTransform, pos);
             lt.ValueRW.Position = pos;
