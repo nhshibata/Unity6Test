@@ -1,8 +1,17 @@
 using System;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+
+public enum EnemyMovementType
+{
+    Linear, 
+    Random, 
+    SinWave,
+    Waypoint
+}
 
 [Serializable]
 public struct EnemyData : IComponentData
@@ -14,12 +23,29 @@ public struct EnemyData : IComponentData
 /// <summary>
 /// 敵の移動コンポーネント
 /// </summary>
+[Serializable]
 public struct EnemyMove : IComponentData
 {
+    public EnemyMovementType MovementType;
     public float Speed;       
     public float3 StartPos;   
     public float3 EndPos;     
     public bool MovingForward;
+
+    // ランダム移動用
+    public float3 RandomDirection;
+    [HideInInspector]
+    public float TimeSinceDirectionChange;
+    public float RandomChangeInterval;
+
+    // サイン波用
+    public float WaveAmplitude;
+    public float WaveFrequency;
+
+    // ウェイポイント移動用
+    public FixedList512Bytes<float3> Waypoints;
+    [HideInInspector]
+    public int CurrentWaypointIndex;
 }
 
 public struct EnemyShooter : IComponentData
@@ -34,11 +60,7 @@ public class EnemyAuthoring : MonoBehaviour
     [SerializeField]
     private EnemyData enemyData;
     [SerializeField]
-    private float speed = 2.0f;
-    [SerializeField]
-    private Vector3 startPos = new Vector3(-3, 0, 0);
-    [SerializeField]
-    private Vector3 endPos = new Vector3(3, 0, 0);
+    private EnemyMove enemyMove;
     [SerializeField]
     private float fireRate;
     [SerializeField]
@@ -54,17 +76,11 @@ public class EnemyAuthoring : MonoBehaviour
 
             AddComponent(entity, authoring.enemyData);
 
-            AddComponent(entity, new EnemyMove
-            {
-                Speed = authoring.speed,
-                StartPos = authoring.startPos,
-                EndPos = authoring.endPos,
-                MovingForward = true,
-            });
+            AddComponent(entity, authoring.enemyMove);
 
             AddComponent(entity, new LocalTransform
             {
-                Position = authoring.startPos,
+                Position = authoring.enemyMove.StartPos,
                 Rotation = quaternion.identity,
                 Scale = 1.0f,
             });

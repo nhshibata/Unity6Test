@@ -48,9 +48,125 @@ MonoBehaviour:
   enemyData:
     Hp: 5
     Damage: 1
-  speed: 2
-  startPos: {x: -3, y: -3, z: 15}
-  endPos: {x: 3, y: -3, z: 15}
+  enemyMove:
+    MovementType: 2
+    Speed: 10
+    StartPos:
+      x: 0
+      y: -3
+      z: 15
+    EndPos:
+      x: 0
+      y: -3
+      z: -10
+    MovingForward: 1
+    RandomDirection:
+      x: 1
+      y: 1
+      z: 1
+    TimeSinceDirectionChange: 0
+    RandomChangeInterval: 2
+    WaveAmplitude: 12
+    WaveFrequency: 2
+    Waypoints:
+      data:
+        offset0000:
+          byte0000: 0
+          byte0008: 0
+        offset0016:
+          byte0000: 0
+          byte0008: 0
+        offset0032:
+          byte0000: 0
+          byte0008: 0
+        offset0048:
+          byte0000: 0
+          byte0008: 0
+        offset0064:
+          byte0000: 0
+          byte0008: 0
+        offset0080:
+          byte0000: 0
+          byte0008: 0
+        offset0096:
+          byte0000: 0
+          byte0008: 0
+        offset0112:
+          byte0000: 0
+          byte0008: 0
+        offset0128:
+          byte0000: 0
+          byte0008: 0
+        offset0144:
+          byte0000: 0
+          byte0008: 0
+        offset0160:
+          byte0000: 0
+          byte0008: 0
+        offset0176:
+          byte0000: 0
+          byte0008: 0
+        offset0192:
+          byte0000: 0
+          byte0008: 0
+        offset0208:
+          byte0000: 0
+          byte0008: 0
+        offset0224:
+          byte0000: 0
+          byte0008: 0
+        offset0240:
+          byte0000: 0
+          byte0008: 0
+        offset0256:
+          byte0000: 0
+          byte0008: 0
+        offset0272:
+          byte0000: 0
+          byte0008: 0
+        offset0288:
+          byte0000: 0
+          byte0008: 0
+        offset0304:
+          byte0000: 0
+          byte0008: 0
+        offset0320:
+          byte0000: 0
+          byte0008: 0
+        offset0336:
+          byte0000: 0
+          byte0008: 0
+        offset0352:
+          byte0000: 0
+          byte0008: 0
+        offset0368:
+          byte0000: 0
+          byte0008: 0
+        offset0384:
+          byte0000: 0
+          byte0008: 0
+        offset0400:
+          byte0000: 0
+          byte0008: 0
+        offset0416:
+          byte0000: 0
+          byte0008: 0
+        offset0432:
+          byte0000: 0
+          byte0008: 0
+        offset0448:
+          byte0000: 0
+          byte0008: 0
+        offset0464:
+          byte0000: 0
+          byte0008: 0
+        offset0480:
+          byte0000: 0
+          byte0008: 0
+        offset0496:
+          byte0000: 0
+          byte0008: 0
+    CurrentWaypointIndex: 0
   fireRate: 0.1666667
   prefabEntity: {fileID: 827968920456032532, guid: 3af5fb02ece4cbe41847ed5950202a83, type: 3}
   hitbox:
