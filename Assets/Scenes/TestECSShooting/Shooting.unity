@@ -151,11 +151,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39a90cc5b9feb154e8c740bc5d236e9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyData:
+    Hp: 5
+    Damage: 1
   speed: 2
   startPos: {x: -3, y: 0, z: 0}
   endPos: {x: 3, y: 0, z: 0}
   fireRate: 0.08333334
   prefabEntity: {fileID: 827968920456032532, guid: 3af5fb02ece4cbe41847ed5950202a83, type: 3}
+  hitbox:
+    Size:
+      x: 1
+      y: 2
+      z: 1
 --- !u!136 &1350099601
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -279,16 +287,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea5f20a0df7322f43a9a1bcd0ca520ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
-  bounds:
-    x: 100
-    y: 100
+  playerData:
+    Hp: 10
+    Speed: 10
+    Bounds:
+      x: 100
+      y: 100
+    Damage: 1
+    IsDead: 0
   move:
     x: 1
     y: 1
   shoot: 1
   fireRate: 0.08333334
   prefabEntity: {fileID: 827968920456032532, guid: 3af5fb02ece4cbe41847ed5950202a83, type: 3}
+  hitbox:
+    Size:
+      x: 1
+      y: 1
+      z: 1
 --- !u!65 &1420453801
 BoxCollider:
   m_ObjectHideFlags: 0
