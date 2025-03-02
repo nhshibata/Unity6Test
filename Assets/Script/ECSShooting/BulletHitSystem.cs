@@ -25,6 +25,9 @@ public partial struct BulletHitSystem : ISystem
                     EnemyScoreEvent.OnDamaged(bullet.ValueRO.Damage);
                     if (enemy.ValueRW.Hp <= 0)
                     {
+                        // 再帰的に子を削除
+                        DestroyChildrenRecursively(ecb, state.EntityManager, enemyEntity);
+
                         ecb.DestroyEntity(enemyEntity);
                         EnemyScoreEvent.OnDefeated(1);
                     }
@@ -63,6 +66,21 @@ public partial struct BulletHitSystem : ISystem
                math.abs(pos1.y - pos2.y) < size.y * 0.5f &&
                math.abs(pos1.z - pos2.z) < size.z * 0.5f;
     }
+
+    void DestroyChildrenRecursively(EntityCommandBuffer ecb, EntityManager entityManager, Entity parentEntity)
+    {
+        if (entityManager.HasComponent<Child>(parentEntity))
+        {
+            DynamicBuffer<Child> children = entityManager.GetBuffer<Child>(parentEntity);
+
+            foreach (var child in children)
+            {
+                DestroyChildrenRecursively(ecb, entityManager, child.Value);
+                ecb.DestroyEntity(child.Value);
+            }
+        }
+    }
+
 }
 
 public static class EnemyScoreEvent

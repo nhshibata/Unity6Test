@@ -37,7 +37,7 @@ public class HitBoxDebugViewer : MonoBehaviour
             Gizmos.matrix = Matrix4x4.identity;
 
 #if UNITY_EDITOR
-            Handles.Label(lt.Position, "Boids");
+            Handles.Label(lt.Position, "Shooting");
 #endif
         }
     }
