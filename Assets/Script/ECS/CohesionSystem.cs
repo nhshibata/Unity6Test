@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -14,6 +15,7 @@ public partial struct CohesionSystem : ISystem
         transformLookUp = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         paramLookUp.Update(ref state);

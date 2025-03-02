@@ -8,11 +8,22 @@ public struct NeighborsEntityBufferElement : IBufferElementData
     public Entity entity;
 }
 
+public static class FishConfig
+{
+    public const int NeighborsEntityBufferMaxSize = 8;
+}
+
 public struct Fish : IComponentData
 {
     public float3 acceleration;
     public float3 velocity;
     public Entity paramEntity;
+}
+
+public struct FishJobData : IComponentData
+{
+    public float3 Position;
+    public float3 Velocity;
 }
 
 public class FishAuthoring : MonoBehaviour
@@ -36,7 +47,13 @@ public class FishBaker : Baker<FishAuthoring>
             acceleration = 0.0f,
             paramEntity = Entity.Null,
         });
-        
+
+        AddComponent(entity, new FishJobData()
+        {
+            Position = fishAuthoring.transform.position,
+            Velocity = UnityEngine.Random.insideUnitSphere,
+        });
+
         // エンティティにDynamicBufferを付与
         AddBuffer<NeighborsEntityBufferElement>(entity);
     }

@@ -153,8 +153,8 @@ MonoBehaviour:
     type: 0
     minSpeed: 2
     maxSpeed: 5
-    areaDistance: 90
-    areaForce: 3
+    areaDistance: 10
+    areaForce: 1
     debugAreaColor:
       x: 1
       y: 1
@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 654176432500614637, guid: 6b7b5761190e1d34085f31733e63b786, type: 3}
-  spawnCount: 100
+  spawnCount: 1000
   randomSeed: 100
   initialized: 0
 --- !u!4 &254335725
@@ -189,7 +189,7 @@ Transform:
   m_GameObject: {fileID: 254335722}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.5, y: 0.01, z: -2.2}
+  m_LocalPosition: {x: 5.7, y: 0.01, z: 1.8}
   m_LocalScale: {x: 5, y: 10, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []

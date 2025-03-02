@@ -1,13 +1,14 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
+
 
 public partial struct AreaSystem : ISystem
 {
     private ComponentLookup<Parameter> paramLookUp;
     private ComponentLookup<LocalTransform> transformLookUp;
     private ComponentLookup<PostTransformMatrix> postTransformMatrixLookUp;
+
 
     public void OnCreate(ref SystemState state)
     {
@@ -51,8 +52,6 @@ public partial struct AreaSystem : ISystem
             // 力のかかる方向をワールド座標系
             addAccel = math.rotate(areaLt.Rotation, addAccel);
             fish.ValueRW.acceleration += addAccel;
-
-            Debug.Log($"{paramEntity}:{scale}:");
         }
     }
 

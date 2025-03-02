@@ -1,8 +1,8 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))] // 他のシステムより優先的に更新
 public partial struct SpawnSystem : ISystem
@@ -12,6 +12,7 @@ public partial struct SpawnSystem : ISystem
         systemState.RequireForUpdate<School>();
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         foreach (var (school, param, lt, ptm, entity) in SystemAPI.Query<RefRW<School>, RefRO<Parameter>, RefRO<LocalTransform>, RefRO<PostTransformMatrix>>().WithEntityAccess())
@@ -56,6 +57,9 @@ public partial struct SpawnSystem : ISystem
             fish.ValueRW.velocity = dir * 2.0f;
             fish.ValueRW.acceleration = 0f;
 
+            var jobData = SystemAPI.GetComponentRW<FishJobData>(entity);
+            jobData.ValueRW.Position = lt.ValueRO.Position;
+            jobData.ValueRW.Velocity = fish.ValueRO.velocity;
         }
     }
 

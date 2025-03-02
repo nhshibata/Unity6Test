@@ -24,8 +24,6 @@ public class SchoolBaker : Baker<SchoolAuthoring>
         var entity = GetEntity(TransformUsageFlags.None);
         var prefab = GetEntity(src.prefab, TransformUsageFlags.Dynamic);
 
-        Debug.Log("config変換");
-
         AddComponent(entity, new School()
         {
             prefab = prefab,
