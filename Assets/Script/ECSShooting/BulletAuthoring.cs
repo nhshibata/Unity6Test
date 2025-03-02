@@ -1,12 +1,11 @@
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 
 public struct Bullet : IComponentData
 {
     public float Speed;
-    public float3 Direction;
     public float Lifetime;
+    public int Damage;
 }
 
 public class BulletAuthoring : MonoBehaviour
@@ -15,8 +14,6 @@ public class BulletAuthoring : MonoBehaviour
     private float speed = 10f;
     [SerializeField]
     private float lifetime = 5f;
-    [SerializeField]
-    private Vector3 direction = Vector3.forward;
 
     public class BulletBaker : Baker<BulletAuthoring>
     {
@@ -26,8 +23,8 @@ public class BulletAuthoring : MonoBehaviour
             AddComponent(entity, new Bullet
             {
                 Speed = authoring.speed,
-                Direction = authoring.direction,
-                Lifetime = authoring.lifetime
+                Lifetime = authoring.lifetime,
+                Damage = 1,
             });
         }
     }

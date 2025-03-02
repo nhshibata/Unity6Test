@@ -1,7 +1,15 @@
+using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+
+[Serializable]
+public struct EnemyData : IComponentData
+{
+    public int Hp;
+    public int Damage;
+}
 
 /// <summary>
 /// 敵の移動コンポーネント
@@ -24,6 +32,8 @@ public struct EnemyShooter : IComponentData
 public class EnemyAuthoring : MonoBehaviour
 {
     [SerializeField]
+    private EnemyData enemyData;
+    [SerializeField]
     private float speed = 2.0f;
     [SerializeField]
     private Vector3 startPos = new Vector3(-3, 0, 0);
@@ -33,12 +43,17 @@ public class EnemyAuthoring : MonoBehaviour
     private float fireRate;
     [SerializeField]
     private GameObject prefabEntity;
+    [SerializeField]
+    private Hitbox hitbox;
 
     class Baker : Baker<EnemyAuthoring>
     {
         public override void Bake(EnemyAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
+
+            AddComponent(entity, authoring.enemyData);
+
             AddComponent(entity, new EnemyMove
             {
                 Speed = authoring.speed,
@@ -60,6 +75,8 @@ public class EnemyAuthoring : MonoBehaviour
                 FireRate = authoring.fireRate,
                 Prefab = bulletPrefab,
             });
+
+            AddComponent(entity, authoring.hitbox);
         }
     }
 }

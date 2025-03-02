@@ -12,8 +12,7 @@ public partial struct PlayerShootSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
         var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
 
-        foreach (var (shooter, transform)
-                 in SystemAPI.Query<RefRW<PlayerShooter>, RefRO<LocalTransform>>())
+        foreach (var (shooter, transform) in SystemAPI.Query<RefRW<PlayerShooter>, RefRO<LocalTransform>>())
         {
             shooter.ValueRW.TimeUntilNextShot -= deltaTime;
 
@@ -21,12 +20,13 @@ public partial struct PlayerShootSystem : ISystem
             {
                 shooter.ValueRW.TimeUntilNextShot = shooter.ValueRO.FireRate;
 
-                // 🔹 Prefab から弾を生成
+                // Prefab から弾を生成
                 Entity bullet = ecb.Instantiate(shooter.ValueRO.Prefab);
+                var pos = transform.ValueRO.Position + transform.ValueRO.Forward() * transform.ValueRO.Scale * 3;
                 ecb.SetComponent(bullet, new LocalTransform
                 {
-                    Position = transform.ValueRO.Position,
-                    Rotation = quaternion.identity,
+                    Position = pos,
+                    Rotation = transform.ValueRO.Rotation,
                     Scale = 1.0f,
                 });
             }

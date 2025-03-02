@@ -1,11 +1,25 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public struct Player : IComponentData
+[Serializable]
+public struct PlayerData : IComponentData
 {
+    public int Hp;
     public float Speed;
     public float2 Bounds;
+    public int Damage;
+    public bool IsDead;
+
+    public PlayerData(int hp, float speed, float2 bounds, int damage, bool isDead)
+    {
+        Hp = hp;
+        Speed = speed;
+        Bounds = bounds;
+        Damage = damage;
+        IsDead = false;
+    }
 }
 
 public struct PlayerInput : IComponentData
@@ -24,9 +38,7 @@ public struct PlayerShooter : IComponentData
 public class PlayerAuthoring : MonoBehaviour
 {
     [SerializeField]
-    private float speed;   
-    [SerializeField]
-    private float2 bounds; 
+    private PlayerData playerData;
     [SerializeField]
     private float2 move;
     [SerializeField]
@@ -35,17 +47,15 @@ public class PlayerAuthoring : MonoBehaviour
     private float fireRate;
     [SerializeField]
     private GameObject prefabEntity;
+    [SerializeField]
+    private Hitbox hitbox;
 
     public class PlayerBaker : Baker<PlayerAuthoring>
     {
         public override void Bake(PlayerAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent(entity, new Player
-            {
-                Speed = authoring.speed,
-                Bounds = authoring.bounds,
-            });
+            AddComponent(entity, authoring.playerData);
 
             AddComponent(entity, new PlayerInput
             {
@@ -59,6 +69,8 @@ public class PlayerAuthoring : MonoBehaviour
                 FireRate = authoring.fireRate,
                 Prefab = bulletPrefab,
             });
+
+            AddComponent(entity, authoring.hitbox);
         }
     }
 }

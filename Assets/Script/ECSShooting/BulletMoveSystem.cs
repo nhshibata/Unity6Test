@@ -19,7 +19,7 @@ public partial struct BulletMoveSystem : ISystem
         foreach (var (bullet, transform, entity) in SystemAPI.Query<RefRW<Bullet>, RefRW<LocalTransform>>().WithEntityAccess())
         {
             // 位置を更新
-            transform.ValueRW.Position += bullet.ValueRO.Direction * bullet.ValueRO.Speed * deltaTime;
+            transform.ValueRW.Position += transform.ValueRO.Forward() * bullet.ValueRO.Speed * deltaTime;
 
             // 生存時間を減らす
             bullet.ValueRW.Lifetime -= deltaTime;

@@ -10,7 +10,7 @@ public partial struct PlayerMoveSystem : ISystem
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
 
-        foreach (var (player, input, transform) in SystemAPI.Query<RefRO<Player>, RefRO<PlayerInput>, RefRW<LocalTransform>>())
+        foreach (var (player, input, transform) in SystemAPI.Query<RefRO<PlayerData>, RefRO<PlayerInput>, RefRW<LocalTransform>>())
         {
             float2 moveDir = input.ValueRO.Move;
             float3 newPos = transform.ValueRW.Position + new float3(moveDir.x, moveDir.y, 0) * player.ValueRO.Speed * deltaTime;
