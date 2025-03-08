@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7710669911671491179, guid: 0b49d83bbabcaef4fba0f9bea0a2bc75, type: 3}
       propertyPath: enemyMove.WaveAmplitude
-      value: 10
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

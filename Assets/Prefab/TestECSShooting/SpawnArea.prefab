@@ -44,11 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfca580162ccde9449b5275758110f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0, z: 0}
-  size: {x: 50, y: 50, z: 5}
-  enemyPrefabs:
-  - {fileID: 767519026200977764, guid: 0b49d83bbabcaef4fba0f9bea0a2bc75, type: 3}
-  - {fileID: 6000909506796639704, guid: cd9e24ce727d66f45972ea0e65a63c41, type: 3}
-  rows: 3
-  columns: 3
-  spacing: 2
+  spawnArea:
+    Center:
+      x: 0
+      y: 0
+      z: 0
+    Extents:
+      x: 10
+      y: 10
+      z: 3
+    HasSpawned: 0
+    Rows: 1
+    Columns: 1
+    Spacing: 2
+    OffsetZ: 5
+  enemyPrefab: {fileID: 6000909506796639704, guid: cd9e24ce727d66f45972ea0e65a63c41, type: 3}

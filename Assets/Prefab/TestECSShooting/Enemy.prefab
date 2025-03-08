@@ -50,6 +50,7 @@ MonoBehaviour:
     Damage: 1
   enemyMove:
     MovementType: 2
+    IsMovingForward: 0
     Speed: 10
     StartPos:
       x: 0
@@ -60,14 +61,15 @@ MonoBehaviour:
       y: -3
       z: -10
     MovingForward: 1
+    TargetDistance: 0
     RandomDirection:
       x: 1
       y: 1
       z: 1
     TimeSinceDirectionChange: 0
     RandomChangeInterval: 2
-    WaveAmplitude: 12
-    WaveFrequency: 2
+    WaveAmplitude: 0.1
+    WaveFrequency: 1
     Waypoints:
       data:
         offset0000:
@@ -168,7 +170,7 @@ MonoBehaviour:
           byte0008: 0
     CurrentWaypointIndex: 0
   fireRate: 0.1666667
-  prefabEntity: {fileID: 827968920456032532, guid: 3af5fb02ece4cbe41847ed5950202a83, type: 3}
+  prefabEntity: {fileID: 827968920456032532, guid: 0942793d049172e43a8b13006be90212, type: 3}
   hitbox:
     Size:
       x: 2
