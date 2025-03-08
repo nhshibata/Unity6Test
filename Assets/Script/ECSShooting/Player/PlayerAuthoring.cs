@@ -11,14 +11,18 @@ public struct PlayerData : IComponentData
     public float2 Bounds;
     public int Damage;
     public bool IsDead;
+    public bool AutoMoveForward; 
+    public float ForwardSpeed;   
 
-    public PlayerData(int hp, float speed, float2 bounds, int damage, bool isDead)
+    public PlayerData(int hp, float speed, float2 bounds, int damage, bool isDead, bool autoMoveForward, float forwardSpeed)
     {
         Hp = hp;
         Speed = speed;
         Bounds = bounds;
         Damage = damage;
         IsDead = false;
+        AutoMoveForward = autoMoveForward;
+        ForwardSpeed = forwardSpeed;
     }
 }
 

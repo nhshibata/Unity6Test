@@ -32,6 +32,9 @@ public struct EnemyMove : IComponentData
     public float3 EndPos;     
     public bool MovingForward;
 
+    public float3 Direction;
+    public float TargetDistance;
+
     // ランダム移動用
     public float3 RandomDirection;
     [HideInInspector]

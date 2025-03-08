@@ -15,6 +15,12 @@ public partial struct PlayerMoveSystem : ISystem
             float2 moveDir = input.ValueRO.Move;
             float3 newPos = transform.ValueRW.Position + new float3(moveDir.x, moveDir.y, 0) * player.ValueRO.Speed * deltaTime;
 
+            // 自動前進
+            if (player.ValueRO.AutoMoveForward)
+            {
+                newPos.y += player.ValueRO.ForwardSpeed * deltaTime;
+            }
+
             // 画面の範囲制限
             newPos.x = math.clamp(newPos.x, -player.ValueRO.Bounds.x, player.ValueRO.Bounds.x);
             newPos.y = math.clamp(newPos.y, -player.ValueRO.Bounds.y, player.ValueRO.Bounds.y);

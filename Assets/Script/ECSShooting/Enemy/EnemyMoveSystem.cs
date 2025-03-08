@@ -39,14 +39,19 @@ public partial struct EnemyMoveSystem : ISystem
     // 直線移動
     private float3 MoveLinear(ref EnemyMove enemy, float3 pos, float deltaTime)
     {
-        float3 targetPos = enemy.MovingForward ? enemy.EndPos : enemy.StartPos;
+        float3 targetPos = enemy.StartPos + (enemy.Direction * enemy.TargetDistance);
         float3 dir = math.normalize(targetPos - pos);
         pos += dir * enemy.Speed * deltaTime;
 
+        // 目標地点に到達したか判定
         if (math.distance(pos, targetPos) < 0.1f)
         {
-            enemy.MovingForward = !enemy.MovingForward;
+            // 進行方向を反転
+            enemy.Direction = -enemy.Direction;
+            // 新しい開始位置を現在位置に更新
+            enemy.StartPos = pos;
         }
+
         return pos;
     }
 
