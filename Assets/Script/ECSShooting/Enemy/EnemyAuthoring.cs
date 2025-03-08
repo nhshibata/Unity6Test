@@ -27,12 +27,12 @@ public struct EnemyData : IComponentData
 public struct EnemyMove : IComponentData
 {
     public EnemyMovementType MovementType;
+    public bool IsMovingForward;
     public float Speed;       
     public float3 StartPos;   
     public float3 EndPos;     
     public bool MovingForward;
 
-    public float3 Direction;
     public float TargetDistance;
 
     // ランダム移動用

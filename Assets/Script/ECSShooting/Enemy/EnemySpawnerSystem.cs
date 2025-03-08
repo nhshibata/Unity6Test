@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 [BurstCompile]
 public partial struct EnemySpawnerSystem : ISystem
@@ -17,36 +18,45 @@ public partial struct EnemySpawnerSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         var playerQuery = SystemAPI.QueryBuilder().WithAll<PlayerData, LocalTransform>().Build();
-        if (playerQuery.IsEmpty) return;
+        if (playerQuery.IsEmpty) 
+            return;
 
-        var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerQuery.GetSingletonEntity());
+        var playerEntity = playerQuery.GetSingletonEntity();
+        if (playerEntity == Entity.Null)
+            return;
+
+        var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
         float3 playerPos = playerTransform.Position;
+        var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
 
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
-
-        foreach (var (spawnArea, entity) in SystemAPI.Query<RefRW<SpawnArea>>().WithEntityAccess())
+        foreach (var (spawnArea, lt, entity) in SystemAPI.Query<RefRW<SpawnArea>, RefRW<LocalTransform>>().WithEntityAccess())
         {
-            if (spawnArea.ValueRO.HasSpawned) continue;
+            if (spawnArea.ValueRO.HasSpawned)
+                continue;
 
-            if (IsInsideAABB(playerPos, spawnArea.ValueRO.Center, spawnArea.ValueRO.Extents))
+            if (CheckAABB(playerPos, spawnArea.ValueRO.Center, spawnArea.ValueRO.Extents))
             {
-                ref var enemyList = ref spawnArea.ValueRO.EnemyPrefabs.Value;
                 int enemyCount = spawnArea.ValueRO.Rows * spawnArea.ValueRO.Columns;
+                Entity enemyPrefab = spawnArea.ValueRO.EnemyPrefab;
+
+                if (!state.EntityManager.HasComponent<Prefab>(enemyPrefab))
+                {
+                    UnityEngine.Debug.LogError("Enemy prefab does not have a Prefab component!");
+                    continue;
+                }
 
                 // グリッド配置の座標を計算
-                GetGridPositions(spawnArea.ValueRO.Center, spawnArea.ValueRO.Rows, spawnArea.ValueRO.Columns, spawnArea.ValueRO.Spacing, out var positions);
+                GetGridPositions(lt.ValueRO.Position + spawnArea.ValueRO.Center, spawnArea.ValueRO, out var positions);
 
                 for (int i = 0; i < enemyCount; i++)
                 {
-                    int enemyIndex = _random.NextInt(enemyList.Prefabs.Length);
-                    Entity enemyPrefab = enemyList.Prefabs[enemyIndex];
-
                     Entity newEnemy = ecb.Instantiate(enemyPrefab);
                     ecb.SetComponent(newEnemy, new LocalTransform { Position = positions[i] });
                 }
 
                 spawnArea.ValueRW.HasSpawned = true;
-                positions.Dispose();
+                positions.Dispose(); // NativeArray のメモリ解放
+                Debug.Log("敵生成!");
             }
         }
 
@@ -54,29 +64,35 @@ public partial struct EnemySpawnerSystem : ISystem
         ecb.Dispose();
     }
 
-    private bool IsInsideAABB(float3 position, float3 center, float3 extents)
+    private static bool CheckAABB(float3 pos1, float3 pos2, float3 size)
     {
-        return math.all(position >= (center - extents) & position <= (center + extents));
+        return math.abs(pos1.x - pos2.x) < size.x * 0.5f &&
+               math.abs(pos1.y - pos2.y) < size.y * 0.5f &&
+               math.abs(pos1.z - pos2.z) < size.z * 0.5f;
     }
 
-    // グリッド状の配置を計算
-    private void GetGridPositions(float3 center, int rows, int cols, float spacing, out NativeArray<float3> positions)
+    private void GetGridPositions(float3 center, SpawnArea spawnArea, out NativeArray<float3> positions)
     {
-        int total = rows * cols;
+        int total = spawnArea.Rows * spawnArea.Columns;
         positions = new NativeArray<float3>(total, Unity.Collections.Allocator.Temp);
 
-        float width = (cols - 1) * spacing;
-        float height = (rows - 1) * spacing;
+        float width = (spawnArea.Columns - 1) * spawnArea.Spacing;
+        float height = (spawnArea.Rows - 1) * spawnArea.Spacing;
 
         int index = 0;
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < spawnArea.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < spawnArea.Columns; j++)
             {
-                positions[index++] = center + new float3(
-                    -width / 2 + j * spacing,
-                    0,
-                    -height / 2 + i * spacing
+                // 少しランダムにずらす（-0.5f ~ 0.5f の範囲でランダム）
+                float offsetX = _random.NextFloat(-0.5f, 0.5f);
+                float offsetY = _random.NextFloat(-0.5f, 0.5f);
+                float offsetZ = _random.NextFloat(-0.5f, 0.5f);
+
+                positions[index++] = spawnArea.Center + new float3(
+                    -width / 2 + j * spawnArea.Spacing + offsetX,
+                    -height / 2 + i * spawnArea.Spacing + offsetY,
+                    spawnArea.OffsetZ + offsetZ // Z軸方向にもランダムなオフセットを加える
                 );
             }
         }

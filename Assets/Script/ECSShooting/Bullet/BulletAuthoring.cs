@@ -1,31 +1,33 @@
+using System;
 using Unity.Entities;
 using UnityEngine;
 
+[Serializable]
 public struct Bullet : IComponentData
 {
+    public enum BulletType
+    {
+        Player,
+        Enemy
+    }
+
     public float Speed;
     public float Lifetime;
     public int Damage;
+    public BulletType type;
 }
 
 public class BulletAuthoring : MonoBehaviour
 {
     [SerializeField]
-    private float speed = 10f;
-    [SerializeField]
-    private float lifetime = 5f;
+    private Bullet bullet;
 
     public class BulletBaker : Baker<BulletAuthoring>
     {
         public override void Bake(BulletAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent(entity, new Bullet
-            {
-                Speed = authoring.speed,
-                Lifetime = authoring.lifetime,
-                Damage = 1,
-            });
+            AddComponent(entity, authoring.bullet);
         }
     }
 }

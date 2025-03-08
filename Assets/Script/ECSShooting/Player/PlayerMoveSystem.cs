@@ -18,7 +18,7 @@ public partial struct PlayerMoveSystem : ISystem
             // 自動前進
             if (player.ValueRO.AutoMoveForward)
             {
-                newPos.y += player.ValueRO.ForwardSpeed * deltaTime;
+                newPos.z += player.ValueRO.ForwardSpeed * deltaTime;
             }
 
             // 画面の範囲制限

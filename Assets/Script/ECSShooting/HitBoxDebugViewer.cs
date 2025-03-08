@@ -35,8 +35,9 @@ public class HitBoxDebugViewer : MonoBehaviour
         {
             var hitbox = manager.GetComponentData<Hitbox>(entity);
             var lt = manager.GetComponentData<LocalTransform>(entity);
-            Gizmos.color = (Vector4)(new float4(1, 0, 1, 1.0f));
-            Gizmos.matrix = Matrix4x4.TRS(lt.Position, lt.Rotation, hitbox.Size);
+
+            Gizmos.color = new Color(1, 0, 1, 1.0f);
+            Gizmos.matrix = Matrix4x4.TRS(lt.Position, Quaternion.identity, hitbox.Size);
             Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
             Gizmos.matrix = Matrix4x4.identity;
 
@@ -44,7 +45,6 @@ public class HitBoxDebugViewer : MonoBehaviour
             Handles.Label(lt.Position, "Hitbox");
 #endif
         }
-
     }
 
     private void DrawAreas()

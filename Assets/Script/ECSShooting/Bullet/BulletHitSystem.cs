@@ -1,6 +1,5 @@
 ﻿using System;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -16,40 +15,46 @@ public partial struct BulletHitSystem : ISystem
         {
             float3 bulletPos = bulletTransform.ValueRO.Position;
 
-            // 敵の当たり判定
-            foreach (var (enemyTransform, enemy, hitbox, enemyEntity) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<EnemyData>, RefRO<Hitbox>>().WithEntityAccess())
+            if(bullet.ValueRO.type != Bullet.BulletType.Enemy)
             {
-                if (CheckAABB(bulletPos, enemyTransform.ValueRO.Position, hitbox.ValueRO.Size))
+                // 敵の当たり判定
+                foreach (var (enemyTransform, enemy, hitbox, enemyEntity) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<EnemyData>, RefRO<Hitbox>>().WithEntityAccess())
                 {
-                    enemy.ValueRW.Hp -= bullet.ValueRO.Damage;
-                    EnemyScoreEvent.OnDamaged(bullet.ValueRO.Damage);
-                    if (enemy.ValueRW.Hp <= 0)
+                    if (CheckAABB(bulletPos, enemyTransform.ValueRO.Position, hitbox.ValueRO.Size))
                     {
-                        // 再帰的に子を削除
-                        DestroyChildrenRecursively(ecb, state.EntityManager, enemyEntity);
+                        enemy.ValueRW.Hp -= bullet.ValueRO.Damage;
+                        EnemyScoreEvent.OnDamaged(bullet.ValueRO.Damage);
+                        if (enemy.ValueRW.Hp <= 0)
+                        {
+                            // 再帰的に子を削除
+                            DestroyChildrenRecursively(ecb, state.EntityManager, enemyEntity);
 
-                        ecb.DestroyEntity(enemyEntity);
-                        EnemyScoreEvent.OnDefeated(1);
+                            ecb.DestroyEntity(enemyEntity);
+                            EnemyScoreEvent.OnDefeated(1);
+                        }
+                        ecb.DestroyEntity(bulletEntity);
                     }
-                    ecb.DestroyEntity(bulletEntity);
                 }
             }
 
-            // プレイヤーの当たり判定
-            foreach (var (playerTransform, player, hitbox, playerEntity) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<PlayerData>, RefRO<Hitbox>>().WithEntityAccess())
+            if (bullet.ValueRO.type != Bullet.BulletType.Player)
             {
-                if (CheckAABB(bulletPos, playerTransform.ValueRO.Position, hitbox.ValueRO.Size))
+                // プレイヤーの当たり判定
+                foreach (var (playerTransform, player, hitbox, playerEntity) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<PlayerData>, RefRO<Hitbox>>().WithEntityAccess())
                 {
-                    player.ValueRW.Hp -= bullet.ValueRO.Damage;
-                    PlayerHealthEvent.OnHealthChange(player.ValueRW.Hp);
-
-                    if (player.ValueRW.Hp <= 0)
+                    if (CheckAABB(bulletPos, playerTransform.ValueRO.Position, hitbox.ValueRO.Size))
                     {
-                        player.ValueRW.IsDead = true;
-                        PlayerHealthEvent.OnDefeated();
-                        ecb.DestroyEntity(playerEntity);
+                        player.ValueRW.Hp -= bullet.ValueRO.Damage;
+                        PlayerHealthEvent.OnHealthChange(player.ValueRW.Hp);
+
+                        if (player.ValueRW.Hp <= 0)
+                        {
+                            player.ValueRW.IsDead = true;
+                            PlayerHealthEvent.OnDefeated();
+                            ecb.DestroyEntity(playerEntity);
+                        }
+                        ecb.DestroyEntity(bulletEntity);
                     }
-                    ecb.DestroyEntity(bulletEntity);
                 }
             }
         }

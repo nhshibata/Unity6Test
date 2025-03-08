@@ -1,38 +1,29 @@
+using System;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
+[Serializable]
 public struct SpawnArea : IComponentData
 {
     public float3 Center;
     public float3 Extents;
     public bool HasSpawned;
-    public BlobAssetReference<SpawnEnemyList> EnemyPrefabs;
+    public Entity EnemyPrefab; 
 
     public int Rows;
     public int Columns;
     public float Spacing;
-}
-
-public struct SpawnEnemyList
-{
-    public BlobArray<Entity> Prefabs;
+    public float OffsetZ;
 }
 
 public class SpawnAreaAuthoring : MonoBehaviour
 {
     [SerializeField]
-    private Vector3 center;
+    private SpawnArea spawnArea;
     [SerializeField]
-    private Vector3 size;
-    [SerializeField]
-    private GameObject[] enemyPrefabs;
-    [SerializeField]
-    private int rows = 3;
-    [SerializeField]
-    private int columns = 3;
-    [SerializeField]
-    private float spacing = 2.0f;
+    private GameObject enemyPrefab;
 
     class Baker : Baker<SpawnAreaAuthoring>
     {
@@ -40,28 +31,26 @@ public class SpawnAreaAuthoring : MonoBehaviour
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
 
-            var builder = new BlobBuilder(Unity.Collections.Allocator.Temp);
-            ref var enemyList = ref builder.ConstructRoot<SpawnEnemyList>();
-            var prefabArray = builder.Allocate(ref enemyList.Prefabs, authoring.enemyPrefabs.Length);
-
-            for (int i = 0; i < authoring.enemyPrefabs.Length; i++)
+            if (authoring.spawnArea.EnemyPrefab == null)
             {
-                prefabArray[i] = GetEntity(authoring.enemyPrefabs[i], TransformUsageFlags.Dynamic);
+                UnityEngine.Debug.LogError("Enemy prefab is NULL!");
+                return;
             }
 
-            var blobAsset = builder.CreateBlobAssetReference<SpawnEnemyList>(Unity.Collections.Allocator.Persistent);
-            builder.Dispose();
+            Entity prefabEntity = GetEntity(authoring.enemyPrefab, TransformUsageFlags.Dynamic);
 
-            AddComponent(entity, new SpawnArea
+            if (prefabEntity == Entity.Null)
             {
-                Center = authoring.center,
-                Extents = authoring.size * 0.5f,
-                HasSpawned = false,
-                EnemyPrefabs = blobAsset,
-                Rows = authoring.rows,
-                Columns = authoring.columns,
-                Spacing = authoring.spacing
-            });
+                UnityEngine.Debug.LogError("Enemy prefab failed to convert to Entity!");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"Converted enemy prefab to Entity {prefabEntity.Index}");
+            }
+
+            authoring.spawnArea.EnemyPrefab = prefabEntity;
+            AddComponent(entity, authoring.spawnArea);
         }
     }
 }
+
