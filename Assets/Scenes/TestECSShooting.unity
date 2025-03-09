@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 126303743}
   - component: {fileID: 126303745}
   - component: {fileID: 126303744}
+  - component: {fileID: 126303746}
   m_Layer: 5
   m_Name: Scene
   m_TagString: Untagged
@@ -191,6 +192,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 126303742}
   m_CullTransparentMesh: 1
+--- !u!114 &126303746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126303742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc518adab3039ab4f84a2bb23131944c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 837053097}
+  heartbeatEffect:
+    heartUI: {fileID: 1423939278}
+    minScale: 1
+    maxScale: 1.5
+    minPulseSpeed: 1
+    maxPulseSpeed: 0.5
+    minPulseStrength: 0.1
+    maxPulseStrength: 0.3
 --- !u!1001 &159715733
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -710,6 +732,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab721816a9ef5c48ab1f32ce7004a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shootingView: {fileID: 126303746}
 --- !u!4 &898532316
 Transform:
   m_ObjectHideFlags: 0
@@ -812,8 +835,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 952849253}
   serializedVersion: 2
-  m_LocalRotation: {x: -8.170636e-26, y: -0.000000020127667, z: -1.6445585e-33, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: -22.8}
+  m_LocalRotation: {x: 0.04981371, y: -4.9528145e-16, z: 2.4702473e-17, w: 0.99875855}
+  m_LocalPosition: {x: 0, y: -2, z: -22.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -962,7 +985,7 @@ MonoBehaviour:
     AngularDampingMode: 0
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
-  FollowOffset: {x: 0, y: 0, z: -10}
+  FollowOffset: {x: 0, y: 1, z: -10}
 --- !u!114 &1054002502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1014,8 +1037,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1054002499}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.000000020127667, z: -4.0594054e-18, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: -22.8}
+  m_LocalRotation: {x: 0.04981371, y: -4.9596855e-16, z: 3.8479492e-17, w: 0.99875855}
+  m_LocalPosition: {x: 0, y: -2, z: -22.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1055,9 +1078,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -20, y: -20}
+  m_AnchoredPosition: {x: -150, y: -150}
   m_SizeDelta: {x: 257, y: 257}
-  m_Pivot: {x: 1, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1423939279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1381,9 +1404,9 @@ SceneRoots:
   - {fileID: 952849256}
   - {fileID: 1054002503}
   - {fileID: 1989902141}
-  - {fileID: 898532316}
   - {fileID: 159715733}
   - {fileID: 556051789}
+  - {fileID: 898532316}
   - {fileID: 1476295591}
   - {fileID: 162685180}
   - {fileID: 866296971}
