@@ -6,17 +6,20 @@ using UnityEngine;
 [Serializable]
 public struct PlayerData : IComponentData
 {
+    [HideInInspector]
+    public int MaxHp;
     public int Hp;
     public float Speed;
     public float2 Bounds;
     public int Damage;
     public bool IsDead;
     public bool AutoMoveForward; 
-    public float ForwardSpeed;   
+    public float ForwardSpeed;
 
-    public PlayerData(int hp, float speed, float2 bounds, int damage, bool isDead, bool autoMoveForward, float forwardSpeed)
+    public PlayerData(int hp, int maxHp, float speed, float2 bounds, int damage, bool isDead, bool autoMoveForward, float forwardSpeed)
     {
         Hp = hp;
+        MaxHp = Hp;
         Speed = speed;
         Bounds = bounds;
         Damage = damage;

@@ -9,6 +9,13 @@ using UnityEngine;
 [BurstCompile]
 public partial struct BulletMoveSystem : ISystem
 {
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        //これよって、ExecuteDemoTipsが作成されてなければ、このSystemは作成されない。
+        state.RequireForUpdate<Bullet>();
+    }
+
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;

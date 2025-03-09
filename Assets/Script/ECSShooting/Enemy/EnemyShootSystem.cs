@@ -21,7 +21,7 @@ public partial struct EnemyShootSystem : ISystem
 
             // Prefab から弾を生成
             Entity bullet = ecb.Instantiate(shooter.ValueRO.Prefab);
-            var pos = transform.ValueRO.Position + transform.ValueRO.Forward() * transform.ValueRO.Scale * 3;
+            var pos = transform.ValueRO.Position + transform.ValueRO.Forward() * transform.ValueRO.Scale * 2;
 
             // Transform を設定（位置は敵の位置、回転はなし）
             ecb.SetComponent(bullet, new LocalTransform
@@ -33,5 +33,6 @@ public partial struct EnemyShootSystem : ISystem
         }
 
         ecb.Playback(state.EntityManager);
+        ecb.Dispose();
     }
 }

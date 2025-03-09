@@ -20,7 +20,11 @@ public partial struct EnemyMoveSystem : ISystem
         {
             float3 newPos = transform.ValueRO.Position;
 
-            switch (enemy.ValueRO.MovementType)
+            UnityEngine.Debug.Log($"移動速度{enemy.ValueRO.Speed}");
+            if (enemy.ValueRO.Speed == 0)
+                continue;
+
+                switch (enemy.ValueRO.MovementType)
             {
                 case EnemyMovementType.Linear:
                     newPos = MoveLinear(ref enemy.ValueRW, ref transform.ValueRW, newPos, deltaTime, elapsedTime);
@@ -48,7 +52,7 @@ public partial struct EnemyMoveSystem : ISystem
         pos += dir * enemy.Speed * deltaTime;
 
         // サイン波による動きを加える
-        pos = MoveSinWave(ref enemy, ref transform,  pos, elapsedTime);
+        pos = MoveSinWave(ref enemy, ref transform, pos, elapsedTime);
 
         return pos;
     }
@@ -70,22 +74,10 @@ public partial struct EnemyMoveSystem : ISystem
         return pos;
     }
 
-    private float3 MoveSinWave(ref EnemyMove enemy, ref LocalTransform transform, float3 startPos, double elapsedTime)
-    {
-        // sin波による動き
-        float offsetX = math.sin((float)elapsedTime * enemy.WaveFrequency) * enemy.WaveAmplitude;
-        float offsetY = math.sin((float)elapsedTime * enemy.WaveFrequency * 2f) * enemy.WaveAmplitude * 0.5f;
-
-        // サイン波の影響を加える
-        float3 newPos = startPos + new float3(offsetX, offsetY, 0);
-        newPos += transform.Forward() * 0.1f;
-
-        return newPos;
-    }
-
     private float3 MoveWaypoint(ref EnemyMove enemy, ref LocalTransform transform, float3 pos, float deltaTime)
     {
-        if (enemy.Waypoints.Length == 0) return pos;
+        if (enemy.Waypoints.Length == 0) 
+            return pos;
 
         // 現在のウェイポイントの方向
         float3 targetPos = enemy.Waypoints[enemy.CurrentWaypointIndex];
@@ -101,5 +93,19 @@ public partial struct EnemyMoveSystem : ISystem
         }
         return pos;
     }
+
+    private float3 MoveSinWave(ref EnemyMove enemy, ref LocalTransform transform, float3 startPos, double elapsedTime)
+    {
+        // sin波による動き
+        float offsetX = math.sin((float)elapsedTime * enemy.WaveFrequency) * enemy.WaveAmplitude;
+        float offsetY = math.sin((float)elapsedTime * enemy.WaveFrequency * 2f) * enemy.WaveAmplitude * 0.5f;
+
+        // サイン波の影響を加える
+        float3 newPos = startPos + new float3(offsetX, offsetY, 0) * enemy.Speed;
+        newPos += transform.Forward() * 0.1f * enemy.Speed;
+
+        return newPos;
+    }
+
 
 }

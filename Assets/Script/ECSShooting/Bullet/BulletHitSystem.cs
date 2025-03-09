@@ -20,7 +20,7 @@ public partial struct BulletHitSystem : ISystem
                 // 敵の当たり判定
                 foreach (var (enemyTransform, enemy, hitbox, enemyEntity) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<EnemyData>, RefRO<Hitbox>>().WithEntityAccess())
                 {
-                    if (CheckAABB(bulletPos, enemyTransform.ValueRO.Position, hitbox.ValueRO.Size))
+                    if (Hitbox.CheckAABB(bulletPos, enemyTransform.ValueRO.Position, hitbox.ValueRO.Size))
                     {
                         enemy.ValueRW.Hp -= bullet.ValueRO.Damage;
                         EnemyScoreEvent.OnDamaged(bullet.ValueRO.Damage);
@@ -42,10 +42,10 @@ public partial struct BulletHitSystem : ISystem
                 // プレイヤーの当たり判定
                 foreach (var (playerTransform, player, hitbox, playerEntity) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<PlayerData>, RefRO<Hitbox>>().WithEntityAccess())
                 {
-                    if (CheckAABB(bulletPos, playerTransform.ValueRO.Position, hitbox.ValueRO.Size))
+                    if (Hitbox.CheckAABB(bulletPos, playerTransform.ValueRO.Position, hitbox.ValueRO.Size))
                     {
                         player.ValueRW.Hp -= bullet.ValueRO.Damage;
-                        PlayerHealthEvent.OnHealthChange(player.ValueRW.Hp);
+                        PlayerHealthEvent.OnHealthChange(player.ValueRO.MaxHp, player.ValueRW.Hp);
 
                         if (player.ValueRW.Hp <= 0)
                         {
@@ -60,16 +60,6 @@ public partial struct BulletHitSystem : ISystem
         }
 
         ecb.Playback(state.EntityManager);
-    }
-
-    /// <summary>
-    /// AABB 判定を行うヘルパー関数
-    /// </summary>
-    private static bool CheckAABB(float3 pos1, float3 pos2, float3 size)
-    {
-        return math.abs(pos1.x - pos2.x) < size.x * 0.5f &&
-               math.abs(pos1.y - pos2.y) < size.y * 0.5f &&
-               math.abs(pos1.z - pos2.z) < size.z * 0.5f;
     }
 
     void DestroyChildrenRecursively(EntityCommandBuffer ecb, EntityManager entityManager, Entity parentEntity)
@@ -99,9 +89,9 @@ public static class EnemyScoreEvent
 
 public static class PlayerHealthEvent
 {
-    public static event Action<int> OnHealthChanged;
+    public static event Action<int, int> OnHealthChanged;
     public static event Action OnPlayerDead;
 
-    public static void OnHealthChange(int hp) => OnHealthChanged?.Invoke(hp);
+    public static void OnHealthChange(int maxHp, int hp) => OnHealthChanged?.Invoke(maxHp, hp);
     public static void OnDefeated() => OnPlayerDead?.Invoke();
 }
